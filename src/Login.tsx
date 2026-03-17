@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
   const navigate = useNavigate();
 
-  // We will replace this with real Supabase Google OAuth later
+  // we will replace this with the actual Supabase Google OAuth
   const handleLogin = () => {
     navigate("/home");
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white font-sans text-black">
-      {/* Logo Icon (Replicating Auth 4.png) */}
+      {/* Logo Icon (placeholder too) */}
       <div className="relative w-12 h-12 bg-blue-600 rounded-lg overflow-hidden flex items-end justify-end p-1 mb-4">
         <div className="w-full h-full border-b-2 border-r-2 border-white absolute bottom-1 right-1"></div>
         <div className="w-full h-[2px] bg-white absolute top-1/2 left-0"></div>
@@ -23,7 +23,7 @@ export default function Login() {
       {/* Google Login Button */}
       <button 
         onClick={handleLogin}
-        className="flex items-center justify-center gap-3 w-72 bg-gray-100 hover:bg-gray-200 transition-colors py-2.5 rounded-md text-sm font-medium"
+        className="flex items-center justify-center gap-3 w-84 bg-gray-100 hover:bg-gray-200 transition-colors py-2.5 rounded-md text-sm font-medium"
       >
         {/* Simple Google G SVG */}
         <svg className="w-5 h-5" viewBox="0 0 24 24">
