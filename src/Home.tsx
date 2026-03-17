@@ -1,0 +1,36 @@
+import MinimalCalendar from "./MinimalCalendar";
+
+export default function Home() {
+  return (
+    <div className="min-h-screen bg-gray-50 font-sans text-black">
+      {/* Top Nav Bar */}
+      <nav className="w-full bg-white border-b border-gray-200 px-6 py-3 flex items-center">
+        {/* logo and title */}
+        <div className="flex items-center gap-3">
+          <div className="relative w-8 h-8 bg-blue-600 rounded-md overflow-hidden flex items-end justify-end p-1">
+            <div className="w-full h-full border-b-2 border-r-2 border-white absolute bottom-0.5 right-0.5"></div>
+            <div className="w-full h-[1.5px] bg-white absolute top-1/2 left-0"></div>
+            <div className="w-[1.5px] h-full bg-white absolute top-0 right-1/4"></div>
+          </div>
+          <span className="text-lg font-bold tracking-tight">Blueprint</span>
+        </div>
+      </nav>
+
+      {/* main content area */}
+      <main className="p-8 md:p-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* left column SAVE THIS SPOT FOR TASKS*/}
+        <div className="md:col-span-2">
+          <h2 className="text-xl font-bold mb-4">Your Tasks</h2>
+          <div className="h-64 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text gray-400">
+            task list under construction. . . 
+          </div>
+        </div>
+
+        {/* right column */}
+        <div className="md:col-span-1">
+          <MinimalCalendar />
+        </div>
+      </main>
+    </div>
+  );
+}
