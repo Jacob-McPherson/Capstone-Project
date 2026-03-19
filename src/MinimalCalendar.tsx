@@ -23,7 +23,7 @@ export default function MinimalCalendar() {
     };
 
     const days = [];
-    for ( let i = 1; i < firstDayOfMonth; i++) {
+    for ( let i = 1; i < firstDayOfMonth + 1; i++) {
         days.push(<div key={`empty-${i}`} className="aspect-square" />);
     }
     for (let day =1; day <= daysInMonth; day++) {
