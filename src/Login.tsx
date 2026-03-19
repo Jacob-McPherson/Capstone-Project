@@ -1,12 +1,24 @@
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom"; code no longer needed will be left as comment instead of complete deletion
+import {supabase} from "./lib/supabase";
 
-export default function Login() {
-  const navigate = useNavigate();
+
+export default function Login() { 
+  //const navigate = useNavigate();
 
   // we will replace this with the actual Supabase Google OAuth
-  const handleLogin = () => {
-    navigate("/home");
-  };
+ // const handleLogin = () => {
+   // navigate("/home");
+  //};
+// switching page to home, no longer needed
+
+const handleLogin = async () => {
+  await supabase.auth.signInWithOAuth({
+   provider: "google",
+   options: { redirectTo: "http://localhost:5173/home",
+
+   } ,
+  });
+};
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white font-sans text-black">
