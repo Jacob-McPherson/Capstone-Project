@@ -1,5 +1,5 @@
-import { supabase } from "./lib/supabase";
-import { useEffect, useState } from "react";
+// import { supabase } from "./lib/supabase";
+// import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./Login";
 import Home from "./Home";
