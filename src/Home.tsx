@@ -1,4 +1,5 @@
 import MinimalCalendar from "./MinimalCalendar";
+import TaskList from "./TaskList";
 
 export default function Home() {
   return (
@@ -21,9 +22,7 @@ export default function Home() {
         {/* left column SAVE THIS SPOT FOR TASKS*/}
         <div className="md:col-span-2">
           <h2 className="text-xl font-bold mb-4">Your Tasks</h2>
-          <div className="h-64 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text gray-400">
-            task list under construction. . . 
-          </div>
+          <TaskList />
         </div>
 
         {/* right column */}
