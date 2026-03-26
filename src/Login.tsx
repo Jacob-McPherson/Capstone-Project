@@ -1,8 +1,6 @@
-//import { useNavigate } from "react-router-dom"; code no longer needed will be left as comment instead of complete deletion
+// import { useNavigate } from "react-router-dom"; code no longer needed will be left as comment instead of complete deletion
 // import TextType from "./lib/TextType";
 import {supabase} from "./lib/supabase";
-
-
 
 export default function Login() { 
   //const navigate = useNavigate();
@@ -14,31 +12,16 @@ export default function Login() {
 // switching page to home, no longer needed
 
 const handleLogin = async () => {
+  const redirectUrl = `${window.location.origin}/home`;
   await supabase.auth.signInWithOAuth({
    provider: "google",
-   options: { redirectTo: "blueprint-taskmanager.vercel.app",
+   options: { redirectTo: redirectUrl,
 
    } ,
   });
 };
 
   return (
-    // <main className="p-8 md:p-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-    //   {/* left column, will have hero of text type to the left of the login form */}
-    //   <div className="hidden md:flex flex-col items-start justify-center gap-6">
-    //     <TextType
-    //       text={["Welcome to", "Blueprint", "Your Ultimate Task Manager"]}
-    //       typingSpeed={75}
-    //       pauseDuration={1500}
-    //       showCursor
-    //       cursorCharacter="_"
-    //       texts={["Welcome to Blueprint! Good to see you!","Your Ultimate Task Manager! Let's get you organized!"]}
-    //       deletingSpeed={50}
-    //       variableSpeedEnabled={false}
-    //       variableSpeedRange={[60, 120]}
-    //       cursorBlinkDuration={0.5}
-    //     />
-    //   </div>
       <div className="min-h-screen flex flex-col items-center justify-center bg-white font-sans text-black">
         {/* Logo Icon (placeholder too) */}
         <div className="relative w-12 h-12 bg-blue-600 rounded-lg overflow-hidden flex items-end justify-end p-1 mb-4">
@@ -77,6 +60,6 @@ const handleLogin = async () => {
           By clicking continue, you agree to our <span className="font-semibold text-gray-700">Terms of Service</span> and <span className="font-semibold text-gray-700">Privacy Policy</span>
         </p>
       </div>
-    // </main>
+  
   );
 }
