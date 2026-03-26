@@ -14,7 +14,7 @@ export default function Login() {
 const handleLogin = async () => {
   await supabase.auth.signInWithOAuth({
    provider: "google",
-   options: { redirectTo: "blueprint-taskmanager.vercel.app",
+   options: { redirectTo: "/home",
 
    } ,
   });
