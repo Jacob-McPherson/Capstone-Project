@@ -1,7 +1,51 @@
+import { useState } from "react";
 import MinimalCalendar from "./MinimalCalendar";
 import TaskList from "./TaskList";
 
+export interface Quest {
+
+  QuestID: string;
+  Details: string;
+  Status: 'todo' | 'in-progress' | 'done';
+  DueDate: string; // formate : YYYY-MM-DD
+  XP: number;
+
+}
+
 export default function Home() {
+
+  const [quests, setQuests] = useState<Quest[]>([
+    {
+      QuestID: '1',
+      Details: 'Finish Capstone Project',
+      Status: 'in-progress',
+      DueDate: '2026-04-22',
+      XP: 50,
+    },
+    {
+      QuestID: '2',
+      Details: 'Study for Finals',
+      Status: 'in-progress',
+      DueDate: '2026-05-26',
+      XP: 100,
+    },
+    {
+      QuestID: '3',
+      Details: 'Complete ERD revisions',
+      Status: 'todo',
+      DueDate: '2026-04-10',
+      XP: 75,
+    }
+  ]);
+
+  const handleStatusChange = (id: string, newStatus: Quest['Status']) => {
+    setQuests(quests.map(q => q.QuestID === id ? { ...q, Status: newStatus } : q));
+  };
+
+  const handleDelete = (id: string) => {
+    setQuests(quests.filter(q => q.QuestID !== id));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-black">
       {/* Top Nav Bar */}
@@ -19,15 +63,24 @@ export default function Home() {
 
       {/* main content area */}
       <main className="p-8 md:p-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+
         {/* left column SAVE THIS SPOT FOR TASKS*/}
         <div className="md:col-span-2">
-          <h2 className="text-xl font-bold mb-4">Your Tasks</h2>
-          <TaskList />
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Your Quests</h2>
+            <span className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1">Level 1 Student</span>
+          </div>
+
+          <TaskList
+            quests={quests}
+            onStatusChange={handleStatusChange}
+            onDelete={handleDelete}
+          />
         </div>
 
         {/* right column */}
         <div className="md:col-span-1">
-          <MinimalCalendar />
+          <MinimalCalendar quests={quests} />
         </div>
       </main>
     </div>

@@ -27,6 +27,7 @@ export default function TaskList() {
         {
             id: '2',
             title: 'Study for exams',
+            description: 'Review all lecture notes and practice problems.',
             status: 'todo',
             priority: 'medium',
             createdAt: new Date().toISOString(),
