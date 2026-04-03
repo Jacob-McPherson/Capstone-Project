@@ -13,6 +13,7 @@ export default function Login() {
 
 const handleLogin = async () => {
   const redirectUrl = `${window.location.origin}/home`;
+  console.log('redirectUrl:', redirectUrl); // added for testing
   await supabase.auth.signInWithOAuth({
    provider: "google",
    options: { redirectTo: redirectUrl,
