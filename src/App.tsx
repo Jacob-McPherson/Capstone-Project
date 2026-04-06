@@ -1,17 +1,16 @@
-// import { supabase } from "./lib/supabase";
-// import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./Login";
-import Home from "./Home";
-import AuthCallback from "./AuthCallback";
 
-<Routes>
-  <Route path="/" element={<Login />} />
-  <Route path="/home" element={<Home />} />
-  <Route path="/auth/callback" element={<AuthCallback />} />
-</Routes>
+// Inline Home component for testing
+function Home() { 
+  return (
+    <div style={{ padding: "2rem", textAlign: "center" }}>
+      <h1>Success! Redirect worked.</h1>
+    </div>
+  ); 
+}
 
-function App() {
+export default function App() {
   return (
     <Router>
       <Routes>
@@ -21,39 +20,3 @@ function App() {
     </Router>
   );
 }
-
-export default App;
-// type Instrument = {
-//   id: number;
-//   name: string;
-// };
-
-
-//   const [instruments, setInstruments] = useState<Instrument[]>([]);
-
-//   useEffect(() => {
-//     getInstruments();
-//   }, []);
-
-//   async function getInstruments() {
-//     const { data, error } = await supabase
-//       .from("instruments")
-//       .select("*");
-
-//     console.log("DATA:", data);
-//     console.log("ERROR:", error);
-
-//     if (error) return;
-//     if (data) setInstruments(data);
-//   }
-
-//   return (
-//     <>
-//       <ul>
-//         {instruments.map((instrument) => (
-//           <li key={instrument.id}>{instrument.name}</li>
-//         ))}
-//       </ul>
-//     </>
-//   );
-// }
