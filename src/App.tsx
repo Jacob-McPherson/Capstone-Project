@@ -4,6 +4,10 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./Login";
 import Home from "./Home";
 
+<Routes>
+  <Route path="/" element={<Login />} />
+  <Route path="/home" element={<Home />} />
+</Routes>
 
 function App() {
   return (
