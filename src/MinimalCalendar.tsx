@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
-import { Quest } from "./Home";
+import { type Quest } from "./Home";
 
 interface CalendarProps {
   quests: Quest[];
