@@ -14,6 +14,8 @@ export interface Quest {
 
 export default function Home() {
 
+  const [activeTab, setActiveTab] = useState<'All Tasks' | 'To Do' | 'In Progress' | 'Done'>('All Tasks');
+  
   const [quests, setQuests] = useState<Quest[]>([
     {
       QuestID: '1',
@@ -68,14 +70,37 @@ export default function Home() {
         <div className="md:col-span-2">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold">Your Quests</h2>
-            <span className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1">Level 1 Student</span>
+            <span className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1">Level 1</span>
           </div>
 
-          <TaskList
-            quests={quests}
-            onStatusChange={handleStatusChange}
-            onDelete={handleDelete}
-          />
+          <div className="bg-gray-200 p-1 rounded-full flex items-center justify-between mb-6">
+            {['All Tasks', 'To Do', 'In Progress', 'Done'].map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab as any)}
+                className={`flex-1 text-center py-2 text-sm font-medium rounded-full transition all ${
+                  activeTab === tab ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-800'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <TaskList 
+              quests={quests.filter(q => {
+                if (activeTab === 'All Tasks') return true;
+                if (activeTab === 'To Do') return q.Status === 'todo';
+                if (activeTab === 'In Progress') return q.Status === 'in-progress';
+                if (activeTab === 'Done') return q.Status === 'done';
+                return true;
+              })}
+              onStatusChange={handleStatusChange}
+              onDelete={handleDelete}
+            />
+          </div>
+          
         </div>
 
         {/* right column */}
