@@ -10,7 +10,7 @@ interface TaskFormProps {
 export default function TaskForm({ onAddTask }: TaskFormProps) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [priority, setPriority] = useState<Quest['priority']>('medium');
+    const [priority, setPriority] = useState<Quest['priority']>('Medium');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -47,7 +47,7 @@ export default function TaskForm({ onAddTask }: TaskFormProps) {
             // reset form
             setTitle('');
             setDescription('');
-            setPriority('medium');
+            setPriority('Medium');
         }
     };
 
@@ -74,9 +74,9 @@ export default function TaskForm({ onAddTask }: TaskFormProps) {
                         onChange={(e) => setPriority(e.target.value as Quest['priority'])}
                         className="bg-gray-200/70 text-gray-800 rounded-lg px-4 py-2 focus:outline-none cursor-pointer"
                     >
-                        <option value="low">Importance: Low</option>
-                        <option value="medium">Importance: Medium</option>
-                        <option value="high">Importance: High</option>
+                        <option value="Low">Importance: Low</option>
+                        <option value="Medium">Importance: Medium</option>
+                        <option value="High">Importance: High</option>
                     </select>
                     <button type="submit" className="flex items-center bg-black hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg transition-colors font-medium text-sm">
                         <Plus className="w-4 h-4 mr-2" />
