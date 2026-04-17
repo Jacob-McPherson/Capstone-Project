@@ -1,13 +1,18 @@
 import { useState } from "react";
+import { useEffect } from "react";
+import { supabase } from "./lib/supabase";
 import MinimalCalendar from "./MinimalCalendar";
 import TaskList from "./TaskList";
+import TaskForm from "./TaskForm";
 
 export interface Quest {
 
-  QuestID: string;
-  Details: string;
-  Status: 'todo' | 'in-progress' | 'done';
-  DueDate: string; // formate : YYYY-MM-DD
+  questID: number;
+  questName: string;
+  questDetails: string;
+  status: 'todo' | 'in-progress' | 'done';
+  priority: 'low' | 'medium' | 'high';
+  dueDate: string | null; // format : YYYY-MM-DD
   XP: number;
 
 }
@@ -16,36 +21,40 @@ export default function Home() {
 
   const [activeTab, setActiveTab] = useState<'All Tasks' | 'To Do' | 'In Progress' | 'Done'>('All Tasks');
   
-  const [quests, setQuests] = useState<Quest[]>([
-    {
-      QuestID: '1',
-      Details: 'Finish Capstone Project',
-      Status: 'in-progress',
-      DueDate: '2026-04-22',
-      XP: 50,
-    },
-    {
-      QuestID: '2',
-      Details: 'Study for Finals',
-      Status: 'in-progress',
-      DueDate: '2026-05-26',
-      XP: 100,
-    },
-    {
-      QuestID: '3',
-      Details: 'Complete ERD revisions',
-      Status: 'todo',
-      DueDate: '2026-04-10',
-      XP: 75,
-    }
-  ]);
+  const [quests, setQuests] = useState<Quest[]>([]);
 
-  const handleStatusChange = (id: string, newStatus: Quest['Status']) => {
-    setQuests(quests.map(q => q.QuestID === id ? { ...q, Status: newStatus } : q));
+  // Fetch quests from Supabase on page / component load
+  useEffect(() => {
+    const fetchMyQuests = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if(!user) return; // not logged in
+
+      const { data, error } = await supabase
+        .from('Quests')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('questID', {ascending: false });
+
+        if (data) setQuests(data);
+    };
+    fetchMyQuests();
+  }, []);
+
+  // creation handler: add new task screen
+  const handleAddTask = (newQuest: Quest) => {
+    setQuests([newQuest, ...quests]);
   };
 
-  const handleDelete = (id: string) => {
-    setQuests(quests.filter(q => q.QuestID !== id));
+  // update handler: change status of task in database and update database
+  const handleStatusChange = async (id: number, newStatus: Quest['status']) => {
+    setQuests(quests.map(q => q.questID === id ? { ...q, status: newStatus } : q));
+    await supabase.from('Quests').update({ status: newStatus }).eq('questID', id);
+  };
+
+  // deletion handler
+  const handleDelete = async (id: number) => {
+    setQuests(quests.filter(q => q.questID !== id));
+    await supabase.from('Quests').delete().eq('questID', id);
   };
 
   return (
@@ -65,12 +74,13 @@ export default function Home() {
 
       {/* main content area */}
       <main className="p-8 md:p-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-
-        {/* left column SAVE THIS SPOT FOR TASKS*/}
         <div className="md:col-span-2">
-          <div className="flex justify-between items-center mb-4">
+          {/* Top section: for task form */}
+          <TaskForm onAddTask={handleAddTask} />
+
+          <div className="flex justify-betweem items-center mb-6 mt-2">
             <h2 className="text-xl font-bold">Your Quests</h2>
-            <span className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1">Level 1</span>
+            <span className="text-sm font-semibold text-blue-600 bg0blue-50 px-3 py-1">Level 1 Student</span>
           </div>
 
           <div className="bg-gray-200 p-1 rounded-full flex items-center justify-between mb-6">
