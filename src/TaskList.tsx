@@ -3,8 +3,8 @@ import { type Quest } from "./Home";
 
 interface TaskListProps {
     quests: Quest[];
-    onStatusChange: (id: string, status: Quest['Status']) => void;
-    onDelete: (id: string) => void;
+    onStatusChange: (id: number, status: Quest['status']) => void;
+    onDelete: (id: number) => void;
 }
 
 export default function TaskList({ quests, onStatusChange, onDelete }: TaskListProps) {
@@ -20,7 +20,7 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
     <div className="flex flex-col gap-4">
       {quests.map(quest => (
         <QuestItem 
-          key={quest.QuestID} 
+          key={quest.questID} 
           quest={quest} 
           onStatusChange={onStatusChange} 
           onDelete={onDelete} 
@@ -33,8 +33,8 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
 // Individual quest card component
 function QuestItem({ quest, onStatusChange, onDelete }: { 
   quest: Quest; 
-  onStatusChange: (id: string, status: Quest['Status']) => void; 
-  onDelete: (id: string) => void }) {
+  onStatusChange: (id: number, status: Quest['status']) => void; 
+  onDelete: (id: number) => void }) {
     
     const statusIcons = {
         'todo': <Circle className="w-6 h-6 text-gray-300 hover:text-blue-500 transition colors" />,
@@ -49,18 +49,18 @@ function QuestItem({ quest, onStatusChange, onDelete }: {
     };
 
     return (
-    <div className={`p-5 bg-white rounded-xl transition-all duration-200 ${
-      quest.Status === 'done' 
+    <div className={`p-5 bg-white rounded-xl transition-all duration-200 shadow-sm border ${
+      quest.status === 'done' 
         ? 'border-green-100 opacity-60' 
         : 'border-white hover:border-gray-200 hover:shadow-md'
       }`}
     >
       <div className="flex items-start gap-4">
         <button
-          onClick={() => onStatusChange(quest.QuestID, nextStatus[quest.Status])}
+          onClick={() => onStatusChange(quest.questID, nextStatus[quest.status])}
           className="mt-0.5 flex-shrink-0 active:scale-95 transition-transform"
         >
-          {statusIcons[quest.Status]}
+          {statusIcons[quest.status]}
         </button>
         
         {/* Main content */}
@@ -69,8 +69,8 @@ function QuestItem({ quest, onStatusChange, onDelete }: {
             
             {/* Quest details -title- with conditional styling for completed tasks */}
             <h3 className={`text-lg font-medium tracking-tight ${
-              quest.Status === 'done' ? 'line-through text-gray-400' : 'text-gray-900'}`}>
-              {quest.Details}
+              quest.status === 'done' ? 'line-through text-gray-400' : 'text-gray-900'}`}>
+              {quest.questName}
             </h3>
 
             {/* XP badge */}
@@ -81,12 +81,14 @@ function QuestItem({ quest, onStatusChange, onDelete }: {
           
           {/* Due date and delete button row */}
           <div className="flex items-center justify-between mt-3">
-            <span className={`text-sm font-medium ${quest.Status === 'done' ? 'text-gray-400' : 'text-red-600'}`}>
-              Due: {quest.DueDate}
+            <span className={`text-sm font-medium ${
+              quest.status === 'done' ? 'text-gray-400' : 'text-red-600'
+              }`}>
+                {quest.dueDate ? `Due: ${quest.dueDate}` : 'No due date'}
             </span>
             
             <button
-              onClick={() => onDelete(quest.QuestID)}
+              onClick={() => onDelete(quest.questID)}
               className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
               title="Delete Quest"
             >

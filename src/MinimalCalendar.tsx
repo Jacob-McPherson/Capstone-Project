@@ -42,7 +42,7 @@ export default function MinimalCalendar({ quests }: CalendarProps) {
         const dateString = `${currentYear}-${currentMonth}-${currentDayStr}`;
 
         // 2. counting how many quests are due on certain date
-        const questsDueToday = quests.filter(q => q.DueDate === dateString && q.Status !== 'done').length;
+        const questsDueToday = quests.filter(q => q.dueDate === dateString && q.status !== 'done').length;
 
         // 3. heat map color logic
         let dayStyle = 'text-gray-700 hover:bg-gray-100 rounded-full cursor-pointer'; // default
