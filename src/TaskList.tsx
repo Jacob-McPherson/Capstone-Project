@@ -37,20 +37,20 @@ function QuestItem({ quest, onStatusChange, onDelete }: {
   onDelete: (id: number) => void }) {
     
     const statusIcons = {
-        'todo': <Circle className="w-6 h-6 text-gray-300 hover:text-blue-500 transition colors" />,
-        'in-progress': <Clock className="w-6 h-6 text-yellow-500" />,
-        'done': <CheckCircle2 className="w-6 h-6 text-green-600" />,
+        'Pending': <Circle className="w-6 h-6 text-gray-300 hover:text-blue-500 transition colors" />,
+        'In-Progress': <Clock className="w-6 h-6 text-yellow-500" />,
+        'Complete': <CheckCircle2 className="w-6 h-6 text-green-600" />,
     };
 
     const nextStatus = {
-        'todo': 'in-progress' as const,
-        'in-progress': 'done' as const,
-        'done': 'todo' as const,
+        'Pending': 'In-Progress' as const,
+        'In-Progress': 'Complete' as const,
+        'Complete': 'Pending' as const,
     };
 
     return (
     <div className={`p-5 bg-white rounded-xl transition-all duration-200 shadow-sm border ${
-      quest.status === 'done' 
+      quest.status === 'Complete' 
         ? 'border-green-100 opacity-60' 
         : 'border-white hover:border-gray-200 hover:shadow-md'
       }`}
@@ -69,7 +69,7 @@ function QuestItem({ quest, onStatusChange, onDelete }: {
             
             {/* Quest details -title- with conditional styling for completed tasks */}
             <h3 className={`text-lg font-medium tracking-tight ${
-              quest.status === 'done' ? 'line-through text-gray-400' : 'text-gray-900'}`}>
+              quest.status === 'Complete' ? 'line-through text-gray-400' : 'text-gray-900'}`}>
               {quest.questName}
             </h3>
 
@@ -82,7 +82,7 @@ function QuestItem({ quest, onStatusChange, onDelete }: {
           {/* Due date and delete button row */}
           <div className="flex items-center justify-between mt-3">
             <span className={`text-sm font-medium ${
-              quest.status === 'done' ? 'text-gray-400' : 'text-red-600'
+              quest.status === 'Complete' ? 'text-gray-400' : 'text-red-600'
               }`}>
                 {quest.dueDate ? `Due: ${quest.dueDate}` : 'No due date'}
             </span>

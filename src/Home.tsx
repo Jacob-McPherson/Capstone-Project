@@ -10,8 +10,8 @@ export interface Quest {
   questID: number;
   questName: string;
   questDetails: string;
-  status: 'todo' | 'in-progress' | 'done';
-  priority: 'low' | 'medium' | 'high';
+  status: 'Pending' | 'In-Progress' | 'Complete';
+  priority: 'Low' | 'Medium' | 'High';
   dueDate: string | null; // format : YYYY-MM-DD
   XP: number;
 
@@ -19,7 +19,7 @@ export interface Quest {
 
 export default function Home() {
 
-  const [activeTab, setActiveTab] = useState<'All Tasks' | 'To Do' | 'In Progress' | 'Done'>('All Tasks');
+  const [activeTab, setActiveTab] = useState<'All Tasks' | 'Pending' | 'In-Progress' | 'Complete'>('All Tasks');
   
   const [quests, setQuests] = useState<Quest[]>([]);
 
@@ -104,9 +104,9 @@ export default function Home() {
             <TaskList 
               quests={quests.filter(q => {
                 if (activeTab === 'All Tasks') return true;
-                if (activeTab === 'To Do') return q.status === 'todo';
-                if (activeTab === 'In Progress') return q.status === 'in-progress';
-                if (activeTab === 'Done') return q.status === 'done';
+                if (activeTab === 'Pending') return q.status === 'Pending';
+                if (activeTab === 'In-Progress') return q.status === 'In-Progress';
+                if (activeTab === 'Complete') return q.status === 'Complete';
                 return true;
               })}
               onStatusChange={handleStatusChange}
