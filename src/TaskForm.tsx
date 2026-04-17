@@ -10,7 +10,7 @@ interface TaskFormProps {
 export default function TaskForm({ onAddTask }: TaskFormProps) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [priority, setPriority] = useState<Quest['priority']>('medium');
+    const [priority, setPriority] = useState<Quest['priority']>('Medium');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,7 +31,7 @@ export default function TaskForm({ onAddTask }: TaskFormProps) {
                     user_id: user.id,
                     questName: title.trim(),
                     questDetails: description.trim() || null,
-                    status: 'todo',
+                    status: 'Pending',
                     priority: priority,
                     XP: 50, // defautl value can be changed later
                     dueDate: null // default for untimed tasks
@@ -47,7 +47,7 @@ export default function TaskForm({ onAddTask }: TaskFormProps) {
             // reset form
             setTitle('');
             setDescription('');
-            setPriority('medium');
+            setPriority('Medium');
         }
     };
 
@@ -59,14 +59,14 @@ export default function TaskForm({ onAddTask }: TaskFormProps) {
                     placeholder="Task"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full bg-gray-200/70 text-gray-900 placeholder-gray-600 rounded-lg px-4 py-2.5 focus:outline-none focus:rin-2 focus:ring-blue-500 transition-all"
+                    className="w-full bg-gray-200/70 text-gray-900 placeholder-gray-500 rounded-lg px-4 py-2.5 focus:outline-none focus:rin-2 focus:ring-blue-500 transition-all"
                 />
                 <input
                     type="text"
                     placeholder="Description (optional)"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full bg-gray-200/70 text-gray-900 placeholder-gray-600 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    className="w-full bg-gray-200/70 text-gray-900 placeholder-gray-500 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 />
                 <div className="flex items-center justify-between mt-1">
                     <select
@@ -74,9 +74,9 @@ export default function TaskForm({ onAddTask }: TaskFormProps) {
                         onChange={(e) => setPriority(e.target.value as Quest['priority'])}
                         className="bg-gray-200/70 text-gray-800 rounded-lg px-4 py-2 focus:outline-none cursor-pointer"
                     >
-                        <option value="low">Importance: Low</option>
-                        <option value="medium">Importance: Medium</option>
-                        <option value="high">Importance: High</option>
+                        <option value="Low">Importance: Low</option>
+                        <option value="Medium">Importance: Medium</option>
+                        <option value="High">Importance: High</option>
                     </select>
                     <button type="submit" className="flex items-center bg-black hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg transition-colors font-medium text-sm">
                         <Plus className="w-4 h-4 mr-2" />
