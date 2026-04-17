@@ -35,7 +35,10 @@ export default function Home() {
         .eq('user_id', user.id)
         .order('questID', {ascending: false });
 
-        if (data) setQuests(data);
+        if (data) { setQuests(data)
+        } else if (error) {
+          console.error("Error fetching quests: ", error.message);
+        }
     };
     fetchMyQuests();
   }, []);
@@ -101,9 +104,9 @@ export default function Home() {
             <TaskList 
               quests={quests.filter(q => {
                 if (activeTab === 'All Tasks') return true;
-                if (activeTab === 'To Do') return q.Status === 'todo';
-                if (activeTab === 'In Progress') return q.Status === 'in-progress';
-                if (activeTab === 'Done') return q.Status === 'done';
+                if (activeTab === 'To Do') return q.status === 'todo';
+                if (activeTab === 'In Progress') return q.status === 'in-progress';
+                if (activeTab === 'Done') return q.status === 'done';
                 return true;
               })}
               onStatusChange={handleStatusChange}

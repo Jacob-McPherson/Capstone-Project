@@ -1,4 +1,4 @@
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import type { Quest } from './Home';
