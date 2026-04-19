@@ -11,12 +11,12 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white font-sans text-black">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 font-sans">
       <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 
         {/* Left side: Hero text and typewriter animation */}
         <div className="hidden md:flex flex-col items-start justify-center pr-8">
-          <h2 className="text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
+          <h2 className="text-6xl font-extrabold text-gray-900 tracking-tight mb-4">
             Welcome to Bloongclart Bloopreent
           </h2>
 
@@ -40,14 +40,12 @@ export default function Login() {
         </div>
 
         {/* Right side login card and show items in rows*/}
-        <div className="bg-white p-10 sm:p-12 rounded-3xl flex felx-col items-center justify-center max-w-md mx-auto w-full border border-gray-100">
+        <div className="bg-white p-10 sm:p-12 rounded-3xl shadow-xl flex flex-col items-center justify-center max-w-md mx-auto w-full border border-gray-100">
 
           <svg className="w-20 h-20 flex-shrink-0" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="32" height="32" rx="8" fill="#2563EB" />
-
             <path d="M23 3.5V30" stroke="white" strokeWidth="2" />
             <path d="M4 25H29.75" stroke="white" strokeWidth="2" />
-
           </svg>
 
           {/* App Name */}
@@ -56,7 +54,7 @@ export default function Login() {
           {/* Google Login Button */}
           <button
             onClick={handleLogin}
-            className="hidden md:flex items-center justify-center gap-3 w-84 bg-gray-100 hover:bg-gray-200 transition-colors py-2.5 rounded-md text-sm font-medium"
+            className="flex items-center justify-center gap-3 w-full bg-gray-100 hover:bg-gray-200 transition-colors py-3.5 rounded-xl text-base font-medium text-gray-800"
           >
             {/* Simple Google G SVG */}
             <svg className="w-5 h-5" viewBox="0 0 24 24">
