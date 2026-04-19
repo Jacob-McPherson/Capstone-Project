@@ -88,7 +88,7 @@ export default function Home() {
           </div>
 
           <div className="bg-gray-200 p-1 rounded-full flex items-center justify-between mb-6">
-            {['All Tasks', 'To Do', 'In Progress', 'Done'].map(tab => (
+            {['All Tasks', 'Pending', 'In-Progress', 'Complete'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
