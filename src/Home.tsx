@@ -104,7 +104,10 @@ export default function Home() {
           <div className="flex flex-col gap-4">
             <TaskList 
               quests={quests.filter(q => {
-                if (activeTab === 'All Tasks') return true;
+                if (activeTab === 'All Tasks') {
+                  console.log(q.status);
+                  return true;
+                }
                 if (activeTab === 'Pending') return q.status === 'Pending';
                 if (activeTab === 'In-Progress') return q.status === 'In-Progress';
                 if (activeTab === 'Complete') return q.status === 'Complete';
