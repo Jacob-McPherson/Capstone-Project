@@ -52,6 +52,7 @@ export default function Home() {
   const handleStatusChange = async (id: number, newStatus: Quest['status']) => {
     setQuests(quests.map(q => q.questID === id ? { ...q, status: newStatus } : q));
     await supabase.from('Quests').update({ status: newStatus }).eq('questID', id);
+    console.log(`Updated quest ${id} to status ${newStatus}`);
   };
 
   // deletion handler
