@@ -4,6 +4,8 @@ import { supabase } from "./lib/supabase";
 import MinimalCalendar from "./MinimalCalendar";
 import TaskList from "./TaskList";
 import TaskForm from "./TaskForm";
+import ProfileSidebar from "./ProfileSidebar";
+import Navbar from "./Navbar";
 
 export interface Quest {
 
@@ -19,9 +21,18 @@ export interface Quest {
 
 export default function Home() {
 
+  //tab state
   const [activeTab, setActiveTab] = useState<'All Tasks' | 'Pending' | 'In-Progress' | 'Complete'>('All Tasks');
-  
+
+  // database state
   const [quests, setQuests] = useState<Quest[]>([]);
+
+  // profile popup state
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  // navbar state
+  const [currentView, setCurrentView] = useState<'dashboard' | 'calendar'>('dashboard');
+  
 
   // Fetch quests from Supabase on page / component load
   useEffect(() => {
@@ -64,17 +75,11 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-black">
       {/* Top Nav Bar */}
-      <nav className="w-full bg-white border-b border-gray-200 px-6 py-3 flex items-center">
-        {/* logo and title */}
-        <div className="flex items-center gap-3">
-          <div className="relative w-8 h-8 bg-blue-600 rounded-md overflow-hidden flex items-end justify-end p-1">
-            <div className="w-full h-full border-b-2 border-r-2 border-white absolute bottom-0.5 right-0.5"></div>
-            <div className="w-full h-[1.5px] bg-white absolute top-1/2 left-0"></div>
-            <div className="w-[1.5px] h-full bg-white absolute top-0 right-1/4"></div>
-          </div>
-          <span className="text-lg font-bold tracking-tight">Blueprint</span>
-        </div>
-      </nav>
+      <Navbar
+        currentView={currentView}
+        setCurrentView={setCurrentView}
+        onOpenProfile={() => setIsProfileOpen(true)}
+      />
 
       {/* main content area */}
       <main className="p-8 md:p-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -125,6 +130,13 @@ export default function Home() {
           <MinimalCalendar quests={quests} />
         </div>
       </main>
+
+      {/* profile sidebar overlay */}
+      <ProfileSidebar 
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+      />
+      
     </div>
   );
 }
