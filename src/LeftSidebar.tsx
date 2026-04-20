@@ -1,4 +1,4 @@
-import { LayoutDashboard, Calendar, Settings, LogOut, Plus, Folder, User } from "lucide-react"
+import { LayoutDashboard, Calendar, Plus, Folder, User } from "lucide-react"
 
 interface LeftSidebarProps {
     currentView: 'dashboard' | 'calendar';
