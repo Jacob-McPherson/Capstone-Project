@@ -16,7 +16,7 @@ export default function Settings() {
         .from('Profiles')
         .select('username')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (data && data.username) {
         setUsername(data.username);
