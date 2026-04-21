@@ -1,9 +1,9 @@
-import { LayoutDashboard, Calendar, Plus, Folder, User, Trash2 } from "lucide-react"
+import { LayoutDashboard, Calendar, Plus, Folder, User, Trash2, Settings } from "lucide-react"
 import type { Project } from "./Home";
 
 interface LeftSidebarProps {
-    currentView: 'dashboard' | 'calendar';
-    setCurrentView: (view: 'dashboard' | 'calendar') => void;
+    currentView: 'dashboard' | 'calendar' | 'settings';
+    setCurrentView: (view: 'dashboard' | 'calendar' | 'settings') => void;
     onOpenProfile: () => void;
     projects: Project[];
     activeProject: number | null;
@@ -46,6 +46,17 @@ export default function LeftSidebar({
                     >
                         <Calendar className="w-4 h-4" />
                         Calendar
+                    </button>
+                    <button
+                        onClick={() => {
+                            setCurrentView('settings')
+                            setActiveProject(null);
+                        }}
+                        className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${currentView === 'settings' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                            }`}
+                    >
+                        <Settings className="w-4 h-4" />
+                        Settings
                     </button>
                 </div>
 
