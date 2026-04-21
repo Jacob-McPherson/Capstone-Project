@@ -90,6 +90,27 @@ export default function Home() {
     }
   };
 
+  const handleDeleteProject = async (projectID: number, projectName: string) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you wish to delete "${projectName}"? This will also delete all quests within this project and cannot be undone.`);
+    if (!confirmDelete) return;
+
+    const { error } = await supabase
+      .from('Projects')
+      .delete()
+      .eq('projectID', projectID);
+
+    if (error) {
+      console.error("Error deleting project:", error.message);
+    } else {
+      setProjects(projects.filter(p => p.projectID !== projectID));
+
+      if (activeProject === projectID) {
+        setActiveProject(null);
+      }
+    }
+  };
+
   // creation handler: add new task screen
   const handleAddTask = (newQuest: Quest) => {
     setQuests([newQuest, ...quests]);
@@ -123,7 +144,8 @@ export default function Home() {
         projects={projects}
         activeProject={activeProject}
         setActiveProject={setActiveProject}
-        onCreateProject={()=> setIsCreateProjectModalOpen(true)}
+        onCreateProject={() => setIsCreateProjectModalOpen(true)}
+        onDeleteProject={handleDeleteProject}
       />
 
       {/* main content area */}
