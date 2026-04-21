@@ -6,6 +6,7 @@ import TaskList from "./TaskList";
 import TaskForm from "./TaskForm";
 import ProfileSidebar from "./ProfileSidebar";
 import LeftSidebar from "./LeftSidebar";
+import Archive from "./Archive";
 
 export interface Quest {
 
