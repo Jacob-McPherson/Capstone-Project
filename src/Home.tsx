@@ -6,6 +6,7 @@ import TaskForm from "./TaskForm";
 import ProfileSidebar from "./ProfileSidebar";
 import LeftSidebar from "./LeftSidebar";
 import Archive from "./Archive";
+import CreateProjectModal from "./CreateProjectModal";
 
 export interface Project {
 
@@ -34,8 +35,10 @@ export default function Home() {
   // database state
   const [quests, setQuests] = useState<Quest[]>([]);
 
-  // profile popup state
+  // profile and modal popup state
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false);
+
 
   // navbar state
   const [currentView, setCurrentView] = useState<'dashboard' | 'calendar'>('dashboard');
@@ -69,9 +72,7 @@ export default function Home() {
   }, []);
 
   // handler to create project
-  const handleCreateProject = async () => {
-    const title = window.prompt("Enter new project name:");
-    if (!title || !title.trim()) return;
+  const handleCreateProject = async (title: string) => {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -122,7 +123,7 @@ export default function Home() {
         projects={projects}
         activeProject={activeProject}
         setActiveProject={setActiveProject}
-        onCreateProject={handleCreateProject}
+        onCreateProject={()=> setIsCreateProjectModalOpen(true)}
       />
 
       {/* main content area */}
@@ -184,6 +185,13 @@ export default function Home() {
         onClose={() => setIsProfileOpen(false)}
       />
 
+      {/* create project modal */}
+      <CreateProjectModal
+        isOpen={isCreateProjectModalOpen}
+        onClose={() => setIsCreateProjectModalOpen(false)}
+        onCreate={handleCreateProject}
+        existingProjects={projects}
+      />
     </div>
 
   );
