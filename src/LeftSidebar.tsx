@@ -1,4 +1,4 @@
-import { LayoutDashboard, Calendar, Plus, Folder, User } from "lucide-react"
+import { LayoutDashboard, Calendar, Plus, Folder, User, Trash2 } from "lucide-react"
 import type { Project } from "./Home";
 
 interface LeftSidebarProps {
@@ -9,11 +9,12 @@ interface LeftSidebarProps {
     activeProject: number | null;
     setActiveProject: (id: number | null) => void;
     onCreateProject: () => void;
+    onDeleteProject: (id: number, name: string) => void;
 }
 
 export default function LeftSidebar({
     currentView, setCurrentView, onOpenProfile,
-    projects, activeProject, setActiveProject, onCreateProject
+    projects, activeProject, setActiveProject, onCreateProject, onDeleteProject
 }: LeftSidebarProps) {
     return (
         <div className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col fixed left-0 top-0">
@@ -40,8 +41,7 @@ export default function LeftSidebar({
                     </button>
                     <button
                         onClick={() => setCurrentView('calendar')}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            currentView === 'calendar' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-100'
+                        className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${currentView === 'calendar' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-100'
                             }`}
                     >
                         <Calendar className="w-4 h-4" />
@@ -63,29 +63,40 @@ export default function LeftSidebar({
                     </div>
 
                     <button
-                        onClick={()=> setActiveProject(null)}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            activeProject === null ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50'
-                        }`}
+                        onClick={() => setActiveProject(null)}
+                        className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeProject === null ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50'
+                            }`}
                     >
-                        <User className={`w-4 h-4 ${
-                            activeProject === null ? 'text-gray-900' : 'text-gray-400'
-                        }`} />
+                        <User className={`w-4 h-4 ${activeProject === null ? 'text-gray-900' : 'text-gray-400'
+                            }`} />
                         Personal Quests
                     </button>
-                    
+
                     {/* map through database projects */}
                     {projects.map((project) => (
-                        <button
+                        <div
                             key={project.projectID}
+                            className={`group flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer ${activeProject === project.projectID ? 'bg-gray-100' : 'hover:bg-gray-50'
+                                }`}
                             onClick={() => setActiveProject(project.projectID)}
-                            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeProject === project.projectID ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50'
-              }`}
-              >
-                <Folder className={`w-4 h-4 ${activeProject === project.projectID ? 'text-blue-500' : 'text-gray-400'}`} />
-              {project.projectTitle}
-              </button>
+                        >
+                            <div className="flex items-center gap-3 overflow-hidden">
+                                <Folder className={`w-4 h-4 flex-shrink-0 ${activeProject === project.projectID ? 'text-blue-500' : 'text-gray-400'}`} />
+                                <span className={`text-sm font-medium truncate ${activeProject === project.projectID ? 'text-gray-900' : 'text-gray-600'}`}>
+                                    {project.projectTitle}
+                                </span>
+                            </div>
+                            {/* delete button only visible on hover to prevent accidental clicks */}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onDeleteProject(project.projectID, project.projectTitle);
+                                }}
+                                className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-all flex-shrink-0"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                        </div>
                     ))}
                 </div>
             </div>
