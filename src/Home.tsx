@@ -55,20 +55,20 @@ export default function Home() {
         .eq('user_id', user.id)
         .order('questID', { ascending: false });
 
-        if (questData) setQuests(questData);
+      if (questData) setQuests(questData);
 
-        // fetch projects
-        const { data: projectData } = await supabase
+      // fetch projects
+      const { data: projectData } = await supabase
         .from('Projects')
         .select('projectID, projectTitle')
         .eq('user_id', user.id)
         .order('projectID', { ascending: true });
-        if (projectData) setProjects(projectData);
+      if (projectData) setProjects(projectData);
     };
     fetchData();
   }, []);
 
-   // handler to create project
+  // handler to create project
   const handleCreateProject = async () => {
     const title = window.prompt("Enter new project name:");
     if (!title || !title.trim()) return;
@@ -79,14 +79,14 @@ export default function Home() {
     const { data, error } = await supabase
       .from('Projects')
       .insert([{ user_id: user.id, projectTitle: title.trim() }])
-      .select();  
+      .select();
 
-      if (error) {
-        console.error("Error creating project:", error.message);
-      } else if (data) {
-        setProjects([...projects, data[0]]);
-        setActiveProject(data[0].projectID);
-      }
+    if (error) {
+      console.error("Error creating project:", error.message);
+    } else if (data) {
+      setProjects([...projects, data[0]]);
+      setActiveProject(data[0].projectID);
+    }
   };
 
   // creation handler: add new task screen
@@ -110,7 +110,7 @@ export default function Home() {
 
   const currentWorkspaceName = activeProject === null
     ? "Personal Quests"
-    : projects.find(p=> p.projectID === activeProject)?.projectTitle || "Project";
+    : projects.find(p => p.projectID === activeProject)?.projectTitle || "Project";
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-black flex">
@@ -131,8 +131,8 @@ export default function Home() {
           <div className="md:col-span-2">
             {/* Top section: for task form */}
             <TaskForm onAddTask={handleAddTask}
-            activeProject={activeProject}
-          />
+              activeProject={activeProject}
+            />
 
             <div className="flex justify-betweem items-center mb-6 mt-2">
               <h2 className="text-xl font-bold">{currentWorkspaceName}</h2>
@@ -144,8 +144,7 @@ export default function Home() {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
-                  className={`flex-1 text-center py-2 text-sm font-medium rounded-full transition all ${
-                    activeTab === tab ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-800'
+                  className={`flex-1 text-center py-2 text-sm font-medium rounded-full transition all ${activeTab === tab ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-800'
                     }`}
                 >
                   {tab}
@@ -166,7 +165,6 @@ export default function Home() {
                 onDelete={handleDelete}
               />
             </div>
-
             <div className="mt-12">
               <h2 className="text-xl font-bold mb-4">Archived Quests</h2>
               <Archive quests={quests.filter(q => q.status === 'Complete')} /> // temp placement
@@ -179,7 +177,7 @@ export default function Home() {
           </div>
         </main>
       </div>
-      
+
       {/* profile sidebar overlay */}
       <ProfileSidebar
         isOpen={isProfileOpen}
