@@ -5,6 +5,7 @@ import TaskList from "./TaskList";
 import TaskForm from "./TaskForm";
 import ProfileSidebar from "./ProfileSidebar";
 import LeftSidebar from "./LeftSidebar";
+import Archive from "./Archive";
 
 export interface Project {
 
@@ -164,6 +165,11 @@ export default function Home() {
                 onStatusChange={handleStatusChange}
                 onDelete={handleDelete}
               />
+            </div>
+
+            <div className="mt-12">
+              <h2 className="text-xl font-bold mb-4">Archived Quests</h2>
+              <Archive quests={quests.filter(q => q.status === 'Complete')} /> // temp placement
             </div>
           </div>
 
