@@ -2,9 +2,9 @@ import { Trash2, Clock, CheckCircle2, Circle } from "lucide-react";
 import { type Quest } from "./Home";
 
 interface TaskListProps {
-    quests: Quest[];
-    onStatusChange: (id: number, status: Quest['status']) => void;
-    onDelete: (id: number) => void;
+  quests: Quest[];
+  onStatusChange: (id: number, status: Quest['status']) => void;
+  onDelete: (id: number) => void;
 }
 
 export default function TaskList({ quests, onStatusChange, onDelete }: TaskListProps) {
@@ -19,11 +19,11 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
   return (
     <div className="flex flex-col gap-4">
       {quests.map(quest => (
-        <QuestItem 
-          key={quest.questID} 
-          quest={quest} 
-          onStatusChange={onStatusChange} 
-          onDelete={onDelete} 
+        <QuestItem
+          key={quest.questID}
+          quest={quest}
+          onStatusChange={onStatusChange}
+          onDelete={onDelete}
         />
       ))}
     </div>
@@ -31,27 +31,27 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
 }
 
 // Individual quest card component
-function QuestItem({ quest, onStatusChange, onDelete }: { 
-  quest: Quest; 
-  onStatusChange: (id: number, status: Quest['status']) => void; 
-  onDelete: (id: number) => void }) {
-    
-    const statusIcons = {
-        'Pending': <Circle className="w-6 h-6 text-gray-300 hover:text-blue-500 transition colors" />,
-        'In-Progress': <Clock className="w-6 h-6 text-yellow-500" />,
-        'Complete': <CheckCircle2 className="w-6 h-6 text-green-600" />,
-    };
+function QuestItem({ quest, onStatusChange, onDelete }: {
+  quest: Quest;
+  onStatusChange: (id: number, status: Quest['status']) => void;
+  onDelete: (id: number) => void
+}) {
 
-    const nextStatus = {
-        'Pending': 'In-Progress' as const,
-        'In-Progress': 'Complete' as const,
-        'Complete': 'Pending' as const,
-    };
+  const statusIcons = {
+    'Pending': <Circle className="w-6 h-6 text-gray-300 hover:text-blue-500 transition colors" />,
+    'In-Progress': <Clock className="w-6 h-6 text-yellow-500" />,
+    'Complete': <CheckCircle2 className="w-6 h-6 text-green-600" />,
+  };
 
-    return (
-    <div className={`p-5 bg-white rounded-xl transition-all duration-200 shadow-sm border ${
-      quest.status === 'Complete' 
-        ? 'border-green-100 opacity-60' 
+  const nextStatus = {
+    'Pending': 'In-Progress' as const,
+    'In-Progress': 'Complete' as const,
+    'Complete': 'Pending' as const,
+  };
+
+  return (
+    <div className={`p-5 bg-white rounded-xl transition-all duration-200 shadow-sm border ${quest.status === 'Complete'
+        ? 'border-green-100 opacity-60'
         : 'border-white hover:border-gray-200 hover:shadow-md'
       }`}
     >
@@ -62,14 +62,13 @@ function QuestItem({ quest, onStatusChange, onDelete }: {
         >
           {statusIcons[quest.status]}
         </button>
-        
+
         {/* Main content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-4">
-            
+
             {/* Quest details -title- with conditional styling for completed tasks */}
-            <h3 className={`text-lg font-medium tracking-tight ${
-              quest.status === 'Complete' ? 'line-through text-gray-400' : 'text-gray-900'}`}>
+            <h3 className={`text-lg font-medium tracking-tight ${quest.status === 'Complete' ? 'line-through text-gray-400' : 'text-gray-900'}`}>
               {quest.questName}
             </h3>
 
@@ -78,15 +77,14 @@ function QuestItem({ quest, onStatusChange, onDelete }: {
               +{quest.XP} XP
             </span>
           </div>
-          
+
           {/* Due date and delete button row */}
           <div className="flex items-center justify-between mt-3">
-            <span className={`text-sm font-medium ${
-              quest.status === 'Complete' ? 'text-gray-400' : 'text-red-600'
+            <span className={`text-sm font-medium ${quest.status === 'Complete' ? 'text-gray-400' : 'text-red-600'
               }`}>
-                {quest.dueDate ? `Due: ${quest.dueDate}` : 'No due date'}
+              {quest.dueDate ? `Due: ${quest.dueDate}` : 'No due date'}
             </span>
-            
+
             <button
               onClick={() => onDelete(quest.questID)}
               className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
