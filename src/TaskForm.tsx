@@ -5,9 +5,10 @@ import type { Quest } from './Home';
 
 interface TaskFormProps {
     onAddTask: (task: Quest) => void;
+    activeProject: number | null; 
 }
 
-export default function TaskForm({ onAddTask }: TaskFormProps) {
+export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [priority, setPriority] = useState<Quest['priority']>('Medium');
@@ -18,10 +19,7 @@ export default function TaskForm({ onAddTask }: TaskFormProps) {
 
         // get secure user id from auth
         const { data: { user } } = await supabase.auth.getUser();
-        if(!user) {
-            alert('You must be logged in to add a task. ');
-            return;
-        }
+        if(!user) return;
 
         // insert task to supabase
         const { data, error } = await supabase
@@ -29,6 +27,7 @@ export default function TaskForm({ onAddTask }: TaskFormProps) {
             .insert([
                 {
                     user_id: user.id,
+                    projectID: activeProject,
                     questName: title.trim(),
                     questDetails: description.trim() || null,
                     status: 'Pending',
