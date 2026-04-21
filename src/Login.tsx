@@ -17,7 +17,7 @@ export default function Login() {
         {/* Left side: Hero text and typewriter animation */}
         <div className="hidden md:flex flex-col items-start justify-center pr-8">
           <h2 className="text-6xl font-extrabold text-gray-900 tracking-tight mb-4">
-            Welcome to Bloongclart Bloopreent
+            Welcome to Blueprint Quest Manager
           </h2>
 
           {/* wrap textype in fixed height div so page doesnt jump up and down so whoever reads this dont change it */}
