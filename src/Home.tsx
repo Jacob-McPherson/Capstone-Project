@@ -121,6 +121,11 @@ export default function Home() {
                 onDelete={handleDelete}
               />
             </div>
+
+            <div className="mt-12">
+              <h2 className="text-xl font-bold mb-4">Archived Quests</h2>
+              <Archive quests={quests.filter(q => q.status === 'Complete')} /> // temp placement
+            </div>
           </div>
 
           {/* right column */}
