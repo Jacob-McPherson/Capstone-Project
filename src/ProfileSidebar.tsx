@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Users, Target } from 'lucide-react';
+import { X, User, Users, Target } from 'lucide-react';
 import { supabase } from "./lib/supabase";
 
 interface ProfileSidebarProps {
@@ -11,6 +11,7 @@ interface ProfileSidebarProps {
 export default function ProfileSidebar({ isOpen, onClose, activeProject }: ProfileSidebarProps) {
     const [teammates, setTeammates] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [username, setUsername] = useState<string>('');
 
     useEffect(() => {
         const fetchTeammates = async () => {
@@ -21,6 +22,20 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
 
             setIsLoading(true);
 
+            //get personal username
+            const { data: { user } } = await supabase.auth.getUser()
+            
+            if (user) {
+                const { data: profile } = await supabase
+                .from('Profiles')
+                .select('username')
+                .eq('id', user.id)
+                .maybeSingle();
+
+                if (profile?.username) {
+                    setUsername(profile.username);
+                }
+            }
             // get project owner ID
             const { data: projectData } = await supabase
                 .from('Projects')
@@ -90,10 +105,10 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
                     <div className="flex flex-col items-center text-center gap-3">
                         <div className="w-32 h-32 bg-gradient-to-tr from-blue-500 to-cyan-400 rounded-full border-4 border-white shadow-lg mb-4 flex items-center justify-center">
                             {/* save this area for the pixel art avatar */}
-                            <Users className="w-18 h-18 text-white" />
+                            <User className="w-18 h-18 text-white" />
                         </div>
                         <div>
-                            <h3 className="text-2xl font-bold text-gray-900">Student Name</h3>
+                            <h3 className="text-2xl font-bold text-gray-900">@{username}</h3>
                             <p className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full inline-block mt-2">Level 1 Student</p>
                         </div>
                     </div>
