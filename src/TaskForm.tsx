@@ -1,25 +1,41 @@
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Calendar as CalendarIcon, Clock, AlertCircle } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import type { Quest } from './Home';
 
 interface TaskFormProps {
     onAddTask: (task: Quest) => void;
-    activeProject: number | null; 
+    activeProject: number | null;
 }
 
 export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [priority, setPriority] = useState<Quest['priority']>('Medium');
+    const [date, setDate] = useState('');
+    const [time, setTime] = useState('');
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if(!title.trim()) return; // require title
+        if (!title.trim()) return; // require title
+
+        setIsSubmitting(true);
 
         // get secure user id from auth
         const { data: { user } } = await supabase.auth.getUser();
-        if(!user) return;
+        if (!user) {
+            setIsSubmitting(false);
+            return;
+        }
+
+        let finalDueDate = null;
+        if (date) {
+            // if no time is selected default to 11:59 PM
+            const timeString = time || "23:59";
+            finalDueDate = `${date}T${timeString}:00`;
+        }
 
         // insert task to supabase
         const { data, error } = await supabase
@@ -47,39 +63,81 @@ export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
             setTitle('');
             setDescription('');
             setPriority('Medium');
+            setDate('');
+            setTime('');
         }
+
+        setIsSubmitting(false);
     };
 
     return (
-        <div className="bg-white p-6 rounded-xl shadow-sm mb-8 w-full">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8 ">
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <input 
+
+                {/* title input */}
+                <input
                     type="text"
-                    placeholder="Task"
+                    placeholder="What needs to be done?"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     className="w-full bg-gray-200/70 text-gray-900 placeholder-gray-500 rounded-lg px-4 py-2.5 focus:outline-none focus:rin-2 focus:ring-blue-500 transition-all"
+                    required
                 />
                 <input
                     type="text"
-                    placeholder="Description (optional)"
+                    placeholder="Quest description (optional)..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     className="w-full bg-gray-200/70 text-gray-900 placeholder-gray-500 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 />
+
+                {/* bottom row controls */}
                 <div className="flex items-center justify-between mt-1">
-                    <select
-                        value={priority}
-                        onChange={(e) => setPriority(e.target.value as Quest['priority'])}
-                        className="bg-gray-200/70 text-gray-800 rounded-lg px-4 py-2 focus:outline-none cursor-pointer"
+                    <AlertCircle className="w-5 h-5 text-gray-400" />
+                    <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
+                        <select
+                            value={priority}
+                            onChange={(e) => setPriority(e.target.value as any)}
+                            className="bg-transparent text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                        >
+                            <option value="Low">Low Priority</option>
+                            <option value="Medium">Medium Priority</option>
+                            <option value="High">High Priority</option>
+                        </select>
+                    </div>
+
+                    {/* date picker */}
+                    <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition all">
+                        <CalendarIcon className={`w-5 h-5 ${date ? 'text-blue-500' : 'text-gray-400'}`} />
+                        <input
+                            type="date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            className="bg-transparent text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                        />
+                    </div>
+
+                    {/* time picker only enabled if a date is selected */}
+                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${date ? 'bg-gray-50 border-gray-200 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500' : 'bg-gray-50/50 border-transparent opacity-50'
+                        }`}>
+                        <Clock className={`w-5 h-5 ${time ? 'text-blue-500' : 'text-gray-400'}`} />
+                        <input
+                            type="time"
+                            value={time}
+                            onChange={(e) => setTime(e.target.value)}
+                            disabled={!date}
+                            className="bg-transparent text-sm font-medium text-gray-700 outline-none cursor-pointer disabled:cursor-not-allowed"
+                        />
+                    </div>
+
+                    {/* submit button */}
+                    <button 
+                    type="submit" 
+                    className="flex items-center bg-black hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg transition-colors font-medium text-sm"
+                    disabled={!title.trim() || isSubmitting}
                     >
-                        <option value="Low">Importance: Low</option>
-                        <option value="Medium">Importance: Medium</option>
-                        <option value="High">Importance: High</option>
-                    </select>
-                    <button type="submit" className="flex items-center bg-black hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg transition-colors font-medium text-sm">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Task
+                        <Plus className="w-5 h-5 mr-2" />
+                        {isSubmitting ? 'Adding...' : 'Add Task'}
                     </button>
                 </div>
             </form>
