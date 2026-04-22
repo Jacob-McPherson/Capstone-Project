@@ -27,7 +27,7 @@ export default function InviteModal({ isOpen, onClose, activeProjectID }: Invite
       .from('Profiles')
       .select('id')
       .eq('username', cleanUsername)
-      .single();
+      .maybeSingle();
 
     if (profileError || !profileData) {
       setStatus('error');
