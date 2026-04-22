@@ -44,17 +44,16 @@ export default function LeftSidebar({
         
         {/* Top: Logo & Title */}
         <div className="p-6 flex items-center gap-3 border-b border-gray-100">
-          <svg className="w-8 h-8 flex-shrink-0" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-10 h-10 flex-shrink-0" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="32" height="32" rx="8" fill="#2563EB" />
-            <path d="M10 0V32" stroke="white" strokeWidth="2" />
-            <path d="M0 22H32" stroke="white" strokeWidth="2" />
-            <rect x="15" y="8" width="11" height="9" stroke="white" strokeWidth="2" rx="1" />
+            <path d="M23 3.5V30" stroke="white" strokeWidth="2" />
+            <path d="M4 25H29.75" stroke="white" strokeWidth="2" />
           </svg>
           <span className="text-xl font-bold tracking-tight text-gray-900">Blueprint</span>
         </div>
 
         {/* Middle: Navigation Links */}
-        <div className="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-8">
+        <div className="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-8 hide-scrollbar">
           
           {/* Global Views */}
           <div className="flex flex-col gap-1">
@@ -131,7 +130,7 @@ export default function LeftSidebar({
                     e.stopPropagation(); 
                     onDeleteProject(project.projectID, project.projectTitle);
                   }}
-                  className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all flex-shrink-0"
+                  className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all flex-shrink-0 md:flex"
                   title="Delete Project"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -155,7 +154,7 @@ export default function LeftSidebar({
               currentView === 'settings' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
-            <Settings className="w-4 h-4" />
+            <Settings className={`w-4 h-4 ${currentView === 'settings' ? 'text-blue-600' : 'text-gray-400'}`} />
             Settings
           </button>
 
