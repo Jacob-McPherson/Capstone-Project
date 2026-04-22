@@ -15,11 +15,6 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
 
     useEffect(() => {
         const fetchTeammates = async () => {
-            if (!activeProject) {
-                setTeammates([]);
-                return;
-            }
-
             setIsLoading(true);
 
             //get personal username
@@ -36,6 +31,13 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
                     setUsername(profile.username);
                 }
             }
+
+            if (!activeProject) {
+                setTeammates([]);
+                setIsLoading(false);
+                return;
+            }
+
             // get project owner ID
             const { data: projectData } = await supabase
                 .from('Projects')
