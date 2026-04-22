@@ -8,6 +8,7 @@ import LeftSidebar from "./LeftSidebar";
 import Archive from "./Archive";
 import CreateProjectModal from "./CreateProjectModal";
 import Settings from "./Settings";
+import { Menu } from "lucide-react";
 
 export interface Project {
 
@@ -46,6 +47,7 @@ export default function Home() {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProject] = useState<number | null>(null); // null makes dashboard set to personal quests
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Fetch data from Supabase on page / component load
   useEffect(() => {
@@ -147,11 +149,29 @@ export default function Home() {
         setActiveProject={setActiveProject}
         onCreateProject={() => setIsCreateProjectModalOpen(true)}
         onDeleteProject={handleDeleteProject}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
 
       {/* main content area */}
-      <div className="flex-1 ml-64 flex flex-col min-h-screen">
-
+      <div className="flex-1 md:ml-64 flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
+        <div className="md:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+          <div className="flex items-center gap-2">
+            <svg className="w-7 h-7 flex-shrink-0" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="8" fill="#2563EB" />
+              <path d="M10 0V32" stroke="white" strokeWidth="2" />
+              <path d="M0 22H32" stroke="white" strokeWidth="2" />
+              <rect x="15" y="8" width="11" height="9" stroke="white" strokeWidth="2" rx="1" />
+            </svg>
+            <span className="text-lg font-bold text-gray-900">Blueprint</span>
+          </div>
+          <button 
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
         <div className="flex-1 ml-64 flex flex-col min-h-screen">
 
           {currentView === 'settings' && <Settings />}
