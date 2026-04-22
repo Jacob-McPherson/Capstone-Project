@@ -80,7 +80,7 @@ export default function InviteModal({ isOpen, onClose, activeProjectID }: Invite
               type="text"
               value={inviteeUsername}
               onChange={(e) => { setInviteeUsername(e.target.value); setStatus('idle'); }}
-              placeholder="isaac_t"
+              placeholder="john_doe"
               autoFocus
               className="w-full bg-gray-50 text-gray-900 rounded-lg pl-8 pr-4 py-3 outline-none border focus:ring-2 focus:ring-blue-500"
             />

@@ -99,7 +99,7 @@ export default function Settings() {
                   setUsername(e.target.value);
                   setStatus('idle'); // Reset status when typing
                 }}
-                placeholder="isaac_t"
+                placeholder="john_doe"
                 className="w-full bg-gray-50 text-gray-900 rounded-xl pl-8 pr-4 py-3 outline-none border border-gray-200 focus:ring-2 focus:ring-blue-500 transition-all"
               />
             </div>
