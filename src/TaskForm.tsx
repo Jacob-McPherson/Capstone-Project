@@ -49,7 +49,7 @@ export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
                     status: 'Pending',
                     priority: priority,
                     XP: 50, // defautl value can be changed later
-                    dueDate: null // default for untimed tasks
+                    dueDate: finalDueDate // default for untimed tasks
                 }
             ])
             .select();
