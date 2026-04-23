@@ -97,7 +97,7 @@ export default function Home() {
         {currentView === 'settings' && <Settings />}
 
         {currentView === 'calendar' && (
-          <main className="flex-1 w-full h-screen p-2 md:p-4 lg:p-6 bg-gray-50">
+          <main className="flex-1 w-full h-screen p-0 bg-transparent flex flex-col overflow-hidden">
             <FullCalendar quests={quests} />
           </main>
         )}
