@@ -48,8 +48,13 @@ export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
                     questDetails: description.trim() || null,
                     status: 'Pending',
                     priority: priority,
+<<<<<<< HEAD
                     XP: 50,
                     dueDate: finalDueDate
+=======
+                    XP: 50, // defautl value can be changed later
+                    dueDate: finalDueDate // default for untimed tasks
+>>>>>>> 5b3af14acc7aec044f59f1046a0228d1863f0c07
                 }
             ])
             .select();
