@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { CheckCircle2, Circle, Clock, Trash2, ChevronDown, AlertCircle, Target } from 'lucide-react';
+import { 
+  CheckCircle2, Circle, CircleDot, PlayCircle,
+  Clock, Trash2, ChevronDown, AlertCircle, Target 
+} from 'lucide-react';
 import type { Quest } from './Home';
 
 interface TaskListProps {
@@ -9,23 +12,17 @@ interface TaskListProps {
 }
 
 export default function TaskList({ quests, onStatusChange, onDelete }: TaskListProps) {
-  // 1. STATE: Keep track of which task IDs are currently expanded
   const [expandedTasks, setExpandedTasks] = useState<Set<number>>(new Set());
 
-  // Helper to toggle the expanded state
   const toggleExpand = (id: number) => {
     setExpandedTasks(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id); // Close it if it's open
-      } else {
-        newSet.add(id); // Open it if it's closed
-      }
+      if (newSet.has(id)) newSet.delete(id); 
+      else newSet.add(id); 
       return newSet;
     });
   };
 
-  // Converts "2026-04-28T15:00:00" to "Due: 2026-04-28 at 3:00 pm"
   const formatDateTime = (dateString: string | null) => {
     if (!dateString) return null;
     const [datePart, timePart] = dateString.split('T');
@@ -39,12 +36,11 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
     return `Due: ${datePart} at ${h}:${minutes} ${ampm}`;
   };
 
-  // If there are no tasks, show a nice empty state
   if (quests.length === 0) {
     return (
       <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-200">
         <Target className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-        <p className="text-gray-500 font-medium">No quests found. Time to add some!</p>
+        <p className="text-gray-500 font-medium">No tasks found. Time to add some!</p>
       </div>
     );
   }
@@ -52,7 +48,6 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
   return (
     <div className="flex flex-col gap-3">
       {quests.map((quest) => {
-        // 2. LOGIC: Check if this specific task is expanded, and if it even has details to show
         const isExpanded = expandedTasks.has(quest.questID);
         const hasDetails = quest.questDetails && quest.questDetails.trim().length > 0;
 
@@ -68,15 +63,17 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
               <div className="flex items-center gap-4 flex-1">
                 <button 
                   onClick={(e) => {
-                    e.stopPropagation(); // Don't expand the task when clicking the checkbox
+                    e.stopPropagation(); 
                     onStatusChange(quest.questID, quest.status === 'Complete' ? 'Pending' : 'Complete');
                   }}
                   className="flex-shrink-0 transition-transform hover:scale-110 active:scale-95"
                 >
                   {quest.status === 'Complete' ? (
                     <CheckCircle2 className="w-6 h-6 text-green-500" />
+                  ) : quest.status === 'In-Progress' ? (
+                    <CircleDot className="w-6 h-6 text-blue-500 hover:text-green-500" />
                   ) : (
-                    <Circle className="w-6 h-6 text-gray-300 hover:text-blue-500" />
+                    <Circle className="w-6 h-6 text-gray-300 hover:text-green-500" />
                   )}
                 </button>
                 
@@ -97,8 +94,31 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
               {/* Right Side: Badges & Controls */}
               <div className="flex items-center gap-3 flex-shrink-0">
                 
+                {/* In-Progress Toggle Button that will hide when progress is complete */}
+                {quest.status !== 'Complete' && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Toggles between In-Progress and Pending
+                      onStatusChange(quest.questID, quest.status === 'In-Progress' ? 'Pending' : 'In-Progress');
+                    }}
+                    className={`hidden sm:flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-md transition-all ${
+                      quest.status === 'In-Progress'
+                        ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                        : 'bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 border border-transparent'
+                    }`}
+                  >
+                    {quest.status === 'In-Progress' ? (
+                      <CircleDot className="w-3.5 h-3.5 animate-pulse" />
+                    ) : (
+                      <PlayCircle className="w-3.5 h-3.5" />
+                    )}
+                    {quest.status === 'In-Progress' ? 'Working' : 'Start'}
+                  </button>
+                )}
+
                 {/* Priority Badge */}
-                <span className={`hidden sm:flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-md ${
+                <span className={`hidden md:flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-md ${
                   quest.priority === 'High' ? 'bg-red-50 text-red-600' :
                   quest.priority === 'Medium' ? 'bg-orange-50 text-orange-600' :
                   'bg-blue-50 text-blue-600'
@@ -107,7 +127,7 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
                   {quest.priority}
                 </span>
 
-                {/* Expand Chevron (Only renders if there are details) */}
+                {/* Expand Chevron */}
                 {hasDetails && (
                   <button 
                     onClick={(e) => {
@@ -133,8 +153,7 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
               </div>
             </div>
 
-            {/* 3. EXPANDED DETAILS SECTION */}
-            {/* Smoothly drops down if isExpanded is true */}
+            {/* EXPANDED DETAILS SECTION */}
             {isExpanded && hasDetails && (
               <div className="px-14 pb-5 pt-1 bg-gray-50/50 border-t border-gray-100 animate-in slide-in-from-top-2 fade-in duration-200">
                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Quest Details</h4>
