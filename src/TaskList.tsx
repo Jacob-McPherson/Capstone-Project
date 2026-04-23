@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { 
-  CheckCircle2, Circle, CircleDot, PlayCircle,
+  CheckCircle2, Circle, CircleDot, PlayCircle, 
   Clock, Trash2, ChevronDown, AlertCircle, Target 
 } from 'lucide-react';
 import type { Quest } from './Home';
@@ -12,8 +12,10 @@ interface TaskListProps {
 }
 
 export default function TaskList({ quests, onStatusChange, onDelete }: TaskListProps) {
+  // STATE: Keep track of which task IDs are currently expanded
   const [expandedTasks, setExpandedTasks] = useState<Set<number>>(new Set());
 
+  // Helper to toggle the expanded state
   const toggleExpand = (id: number) => {
     setExpandedTasks(prev => {
       const newSet = new Set(prev);
@@ -23,6 +25,7 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
     });
   };
 
+  // Clean 12-hour formatting
   const formatDateTime = (dateString: string | null) => {
     if (!dateString) return null;
     const [datePart, timePart] = dateString.split('T');
@@ -36,6 +39,7 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
     return `Due: ${datePart} at ${h}:${minutes} ${ampm}`;
   };
 
+  // Empty state
   if (quests.length === 0) {
     return (
       <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-200">
@@ -48,6 +52,7 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
   return (
     <div className="flex flex-col gap-3">
       {quests.map((quest) => {
+        // Logic: Check if this specific task is expanded, and if it has details to show
         const isExpanded = expandedTasks.has(quest.questID);
         const hasDetails = quest.questDetails && quest.questDetails.trim().length > 0;
 
@@ -63,7 +68,7 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
               <div className="flex items-center gap-4 flex-1">
                 <button 
                   onClick={(e) => {
-                    e.stopPropagation(); 
+                    e.stopPropagation(); // Don't expand when clicking the checkbox
                     onStatusChange(quest.questID, quest.status === 'Complete' ? 'Pending' : 'Complete');
                   }}
                   className="flex-shrink-0 transition-transform hover:scale-110 active:scale-95"
@@ -92,14 +97,13 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
               </div>
 
               {/* Right Side: Badges & Controls */}
-              <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="flex flex-wrap items-center justify-end gap-2 md:gap-3 flex-shrink-0">
                 
-                {/* In-Progress Toggle Button that will hide when progress is complete */}
+                {/* START BUTTON (Visible on Mobile) */}
                 {quest.status !== 'Complete' && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Toggles between In-Progress and Pending
                       onStatusChange(quest.questID, quest.status === 'In-Progress' ? 'Pending' : 'In-Progress');
                     }}
                     className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-md transition-all ${
@@ -113,21 +117,27 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
                     ) : (
                       <PlayCircle className="w-3.5 h-3.5" />
                     )}
-                    {quest.status === 'In-Progress' ? 'Working' : 'Start'}
+                    <span className="hidden sm:inline">{quest.status === 'In-Progress' ? 'Working' : 'Start'}</span>
                   </button>
                 )}
 
-                {/* Priority Badge */}
-                <span className={`hidden md:flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-md ${
-                  quest.priority === 'High' ? 'bg-red-50 text-red-600' :
-                  quest.priority === 'Medium' ? 'bg-orange-50 text-orange-600' :
-                  'bg-blue-50 text-blue-600'
-                }`}>
-                  <AlertCircle className="w-3 h-3" />
-                  {quest.priority}
-                </span>
+                {/* Priority and XP Badges */}
+                <div className="hidden md:flex items-center gap-2">
+                  <span className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-md ${
+                    quest.priority === 'High' ? 'bg-red-50 text-red-600' :
+                    quest.priority === 'Medium' ? 'bg-orange-50 text-orange-600' :
+                    'bg-blue-50 text-blue-600'
+                  }`}>
+                    <AlertCircle className="w-3 h-3" />
+                    {quest.priority}
+                  </span>
+                  
+                  <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-600 border border-indigo-100">
+                    +{quest.XP} XP
+                  </span>
+                </div>
 
-                {/* Expand Chevron */}
+                {/* Expand Chevron (Only renders if there are details) */}
                 {hasDetails && (
                   <button 
                     onClick={(e) => {
