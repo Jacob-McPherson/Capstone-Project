@@ -102,7 +102,7 @@ export default function TaskList({ quests, onStatusChange, onDelete }: TaskListP
                       // Toggles between In-Progress and Pending
                       onStatusChange(quest.questID, quest.status === 'In-Progress' ? 'Pending' : 'In-Progress');
                     }}
-                    className={`hidden sm:flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-md transition-all ${
+                    className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-md transition-all ${
                       quest.status === 'In-Progress'
                         ? 'bg-blue-50 text-blue-600 border border-blue-200'
                         : 'bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 border border-transparent'

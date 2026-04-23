@@ -69,7 +69,7 @@ export default function MinimalCalendar({ quests }: CalendarProps) {
     );
   }
   return (
-    <div className="p-6 bg-white rounded-xl border border-gray-200 shadow-sm w-full">
+    <div className="p-6 bg-white rounded-xl border border-gray-200 shadow-sm w-full max-w-md min-w-[280px] mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-semibold text-gray-900 text-lg">
           {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
