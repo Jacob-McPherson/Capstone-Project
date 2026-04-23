@@ -86,3 +86,42 @@ create table public."XPLog" (
   constraint XPLog_userID_fkey foreign KEY ("userID") references "Users" ("userID") on update CASCADE on delete CASCADE
 ) TABLESPACE pg_default;
 
+ALTER TABLE "Avatars"
+  ADD COLUMN lineage     TEXT NOT NULL DEFAULT '',
+  ADD COLUMN stage       INT  NOT NULL DEFAULT 1,
+  ADD COLUMN displayName TEXT NOT NULL DEFAULT '',
+  ADD COLUMN description  TEXT NOT NULL DEFAULT '';
+
+
+INSERT INTO "Avatars" (lineage, stage, displayName, description, "XPRequired", "imageURL") VALUES
+
+('plant', 1, 'The Seed',       'Every great journey begins in the dark. Potential, coiled tight, waiting for its moment.',          0,    'https://url/plant_1_novice.webp'), -- Replace URL with public url to bucket location in supabase
+('plant', 2, 'First Sprout',   'It broke through the soil. Small, fragile, but undeniably alive. The hard part is just starting.',  500,  'https://url/plant_2_apprentice.webp'),
+('plant', 3, 'Young Oak',      'Roots are forming. Branches reaching. Something worth sheltering under is starting to take shape.', 1500, 'https://url/plant_3_adept.webp'),
+('plant', 4, 'Ancient Oak',    'Centuries of storms, survived. Fireflies nest in its branches. The forest grew around it.',         4000, 'https://url/plant_4_master.webp'),
+
+('dragon', 1, 'The Egg',        'Something stirs within. A faint heat. A faint glow. Whatever is inside — it is patient.',           0,    'https://url/dragon_1_novice.webp'),
+('dragon', 2, 'Hatchling',      'Clumsy, curious, and already breathing embers. The world has no idea what it just let loose.',      500,  'https://url/dragon_2_apprentice.webp'),
+('dragon', 3, 'Wyvern',         'It learned to fly before it learned to land. Every scar is a lesson. Every flame is earned.',       1500, 'https://url/dragon_3_adept.webp'),
+('dragon', 4, 'Elder Dragon',   'Mountains move out of its way. Its name is spoken carefully, and only when necessary.',             4000, 'https://url/dragon_4_master.webp'),
+
+('star', 1, 'Dust Cloud',     'Before the light, there was only drifting. But even dust, given time, can become something blinding.',  0,    'https://url/star_1_novice.webp'),
+('star', 2, 'Dim Star',       'A faint glow at the edge of the sky. Easy to miss. Impossible to extinguish.',                         500,  'https://url/star_2_apprentice.webp'),
+('star', 3, 'Bright Star',    'Navigators use it now. It does not know this. It simply burns, as it always has.',                     1500, 'https://url/star_3_adept.webp'),
+('star', 4, 'Supernova',      'It gave everything. In doing so, it seeded the universe with the material for new worlds.',            4000, 'https://url/star_4_master.webp'),
+
+('knight', 1, 'Squire',           'Wooden sword. Oversized boots. An unshakeable belief that they are destined for something greater.', 0,    'https://url/knight_1_novice.webp'),
+('knight', 2, 'Scout',            'Faster than expected. Quieter than you would think. Starting to understand that skill beats bravado.', 500,  'https://url/knight_2_apprentice.webp'),
+('knight', 3, 'Knight',           'The armor was earned, not given. The plume catches the wind. They have learned when not to draw the sword.', 1500, 'https://url/knight_3_adept.webp'),
+('knight', 4, 'Legendary Knight', 'The blade glows because it has been used in service of something worth glowing for.',              4000, 'https://url/knight_4_master.webp');
+
+
+
+
+
+
+
+
+
+
+
