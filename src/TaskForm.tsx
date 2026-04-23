@@ -33,9 +33,14 @@ export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
         const { data, error } = await supabase
             .from('Quests')
             .insert([{
-                user_id: user.id, projectID: activeProject, questName: title.trim(),
-                questDetails: description.trim() || null, status: 'Pending',
-                priority: priority, XP: 50, dueDate: finalDueDate
+                user_id: user.id, 
+                projectID: activeProject, 
+                questName: title.trim(),
+                questDetails: description.trim() || "", 
+                status: 'Pending',
+                priority: priority, 
+                XP: 50, 
+                dueDate: finalDueDate
             }])
             .select();
 
@@ -66,7 +71,6 @@ export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
                     className="w-full bg-gray-100 text-gray-900 placeholder-gray-500 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 />
 
-                {/* RESPONSIVE BOTTOM ROW */}
                 <div className="flex flex-wrap items-center justify-between gap-4 mt-2 pt-4 border-t border-gray-50">
                     <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto flex-1">
                         

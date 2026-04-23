@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { X, User, Users, Target, Trophy, UserMinus, Crown } from 'lucide-react';
 import { supabase } from "./lib/supabase";
 import { calculateLevel } from "./lib/xpMath";
+import { getActiveAvatar } from "./lib/avatars"; // <-- NEW: Import the avatar logic
 
 interface ProfileSidebarProps {
     isOpen: boolean;
@@ -9,7 +10,6 @@ interface ProfileSidebarProps {
     activeProject: number | null;
 }
 
-// NEW: We need to store the ID so we can delete them!
 interface TeamMember {
     id: string;
     username: string;
@@ -22,6 +22,11 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
     const [username, setUsername] = useState<string>('');
     const [isProjectOwner, setIsProjectOwner] = useState(false);
     
+    // NEW: Avatar States
+    const [userLineage, setUserLineage] = useState<string>('knight');
+    const [totalUserXP, setTotalUserXP] = useState(0);
+    
+    // XP States
     const [userStats, setUserStats] = useState({
       level: 1, title: "Undergrad", currentXP: 0, nextLevelXP: 500, percentage: 0
     });
@@ -33,21 +38,42 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
             const { data: { user } } = await supabase.auth.getUser()
             
             if (user) {
-                const { data: profile } = await supabase.from('Profiles').select('username').eq('id', user.id).maybeSingle();
-                if (profile?.username) setUsername(profile.username);
+                // 1. Fetch Profile Details
+                const { data: profile } = await supabase
+                    .from('Profiles')
+                    .select('username, avatar_lineage')
+                    .eq('id', user.id)
+                    .maybeSingle();
+                
+                if (profile) {
+                    if (profile.username) setUsername(profile.username);
+                    if (profile.avatar_lineage) setUserLineage(profile.avatar_lineage);
+                }
 
-                const { data: completedQuests } = await supabase.from('Quests').select('XP').eq('user_id', user.id).eq('status', 'Complete');
+                // 2. Fetch and Calculate XP
+                const { data: completedQuests } = await supabase
+                    .from('Quests')
+                    .select('XP')
+                    .eq('user_id', user.id)
+                    .eq('status', 'Complete');
+                
                 let totalXP = 0;
                 if (completedQuests) {
                   totalXP = completedQuests.reduce((sum, quest) => sum + (quest.XP || 0), 0);
                 }
                 
+                setTotalUserXP(totalXP); // Save for the Avatar math
                 const stats = calculateLevel(totalXP);
-                setUserStats({
-                  level: stats.level, title: stats.title, currentXP: stats.currentXP, nextLevelXP: stats.nextLevelXP, percentage: stats.progressPercentage
+                setUserStats({ 
+                    level: stats.level, 
+                    title: stats.title, 
+                    currentXP: stats.currentXP, 
+                    nextLevelXP: stats.nextLevelXP, 
+                    percentage: stats.progressPercentage 
                 });
             }
 
+            // 3. Fetch Multiplayer Team
             if (!activeProject) {
                 setTeammates([]);
                 setIsProjectOwner(false);
@@ -55,11 +81,9 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
                 return; 
             }
 
-            // get all ids
             const { data: projectData } = await supabase.from('Projects').select('user_id').eq('projectID', activeProject).maybeSingle();
             const { data: membersData } = await supabase.from('ProjectMembers').select('user_id').eq('project_id', activeProject);
 
-            // Check if the current user is the owner
             if (projectData?.user_id && user?.id === projectData.user_id) {
                 setIsProjectOwner(true);
             } else {
@@ -74,15 +98,13 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
                 const { data: profiles } = await supabase.from('Profiles').select('id, username').in('id', allMembers.map(m => m.id));
                     
                 if (profiles) {
-                    // Map profiles to our new Object structure
                     const mappedTeammates = profiles.map(p => {
                         const match = allMembers.find(m => m.id === p.id);
                         return { id: p.id, username: p.username, isOwner: match?.isOwner || false };
                     }).sort((a, b) => {
-                        if (a.isOwner) return -1; // Owner always at top
+                        if (a.isOwner) return -1;
                         return a.username.localeCompare(b.username);
                     });
-                    
                     setTeammates(mappedTeammates);
                 }
             }
@@ -94,6 +116,7 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
         }
     }, [isOpen, activeProject]);
 
+    // Database Member Removal
     const handleRemoveMember = async (memberId: string, memberUsername: string) => {
         if (!activeProject) return;
         
@@ -107,7 +130,6 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
             .eq('user_id', memberId);
 
         if (!error) {
-            // Instantly remove them from the UI list
             setTeammates(teammates.filter(t => t.id !== memberId));
         } else {
             console.error("Failed to remove member:", error.message);
@@ -129,18 +151,38 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
 
                 <div className="p-6 flex flex-col gap-8 overflow-y-auto flex-1 hide-scrollbar">
                     
+                    {/* AVATAR & USER STATS SECTION */}
                     <div className="flex flex-col items-center text-center gap-2">
-                        <div className="w-24 h-24 bg-gradient-to-tr from-blue-500 to-cyan-400 rounded-full border-4 border-white shadow-lg mb-2 flex items-center justify-center">
-                            <User className="w-10 h-10 text-white" />
+                        
+                        <div className="relative w-28 h-28 rounded-full shadow-lg mb-2 flex items-center justify-center overflow-hidden border-4 border-white bg-gray-100 ring-4 ring-blue-500/20">
+                            {userLineage ? (
+                                <img 
+                                    src={getActiveAvatar(userLineage, totalUserXP).url} 
+                                    alt="User Avatar" 
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => { 
+                                        // Fallback if Supabase URL is broken or missing
+                                        e.currentTarget.src = 'https://via.placeholder.com/150?text=Avatar'; 
+                                    }} 
+                                />
+                            ) : (
+                                <User className="w-10 h-10 text-gray-400" />
+                            )}
                         </div>
+
                         <div>
                             <h3 className="text-2xl font-bold text-gray-900">@{username}</h3>
                             <p className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full inline-block mt-2">
                               Level {userStats.level} {userStats.title}
                             </p>
+                            
+                            <p className="text-xs font-semibold text-gray-500 mt-2 tracking-wide uppercase">
+                              {getActiveAvatar(userLineage, totalUserXP).title}
+                            </p>
                         </div>
                     </div>
 
+                    {/* GAMIFICATION XP BAR */}
                     <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100">
                         <div className="flex justify-between text-sm font-bold text-gray-700 mb-2">
                             <span className="flex items-center gap-1.5"><Trophy className="w-4 h-4 text-orange-500"/> Total XP</span>
@@ -149,24 +191,22 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
                         <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden shadow-inner">
                             <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full transition-all duration-1000 ease-out" style={{ width: `${userStats.percentage}%` }}></div>
                         </div>
-                        <p className="text-xs text-gray-400 mt-3 text-center font-medium">
-                          {userStats.level === 5 ? "Max Level Reached!" : `Complete quests to reach Level ${userStats.level + 1}!`}
-                        </p>
                     </div>
 
                     <hr className="border-gray-100" />
 
+                    {/* PROJECT TEAM SECTION */}
                     <div>
                         <div className="flex items-center gap-2 mb-4">
-                            <Users className="w-7 h-7 text-gray-400" />
-                            <h3 className="text-md font-bold text-gray-400 uppercase tracking-wider">
+                            <Users className="w-5 h-5 text-gray-400" />
+                            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">
                                 {activeProject ? "Project Team" : "Solo Mode"}
                             </h3>
                         </div>
 
                         {!activeProject ? (
                             <div className="bg-gray-50 rounded-xl p-4 text-center border border-dashed border-gray-200">
-                                <Target className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                                <Target className="w-6 h-6 text-gray-300 mx-auto mb-2" />
                                 <p className="text-sm text-gray-500">You are currently viewing your Personal Quests.</p>
                             </div>
                         ) : isLoading ? (
@@ -186,14 +226,14 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
                                                     </div>
                                                 )}
                                             </div>
-                                            <span className="font-semibold text-gray-700 text-md">@{member.username}</span>
+                                            <span className="font-semibold text-gray-700 text-sm">@{member.username}</span>
                                         </div>
 
-                                        {/* remove button only available for owner */}
+                                        {/* Show Remove Button if current user is owner, but don't show it on themselves */}
                                         {isProjectOwner && !member.isOwner && (
                                             <button 
-                                                onClick={() => handleRemoveMember(member.id, member.username)}
-                                                className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-white hover:bg-red-500 rounded-md transition-all flex-shrink-0"
+                                                onClick={() => handleRemoveMember(member.id, member.username)} 
+                                                className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-white hover:bg-red-500 rounded-md transition-all flex-shrink-0" 
                                                 title="Remove Member"
                                             >
                                                 <UserMinus className="w-4 h-4" />
@@ -203,7 +243,7 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
                                 ))}
                                 
                                 {teammates.length === 1 && (
-                                    <p className="text-sm text-gray-400 text-center mt-2">You are the only one in this project.</p>
+                                    <p className="text-xs text-gray-400 text-center mt-2">You are the only one in this project.</p>
                                 )}
                             </div>
                         )}
