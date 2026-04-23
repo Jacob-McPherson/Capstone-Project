@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./lib/supabase";
-import { Menu, UserPlus, Search } from "lucide-react"; // <-- NEW: Added Search Icon
+import { Menu, UserPlus, Search, RefreshCw } from "lucide-react";
 
 // Components
 import MinimalCalendar from "./MinimalCalendar";
@@ -28,24 +28,35 @@ export default function Home() {
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'All Tasks' | 'Pending' | 'In-Progress' | 'Complete'>('All Tasks');
-  
-  // search state
   const [searchQuery, setSearchQuery] = useState('');
   
   const [quests, setQuests] = useState<Quest[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProject] = useState<number | null>(null);
+  
+  // handle the refresh spinning animation state
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
+  const fetchAllData = async () => {
+    setIsRefreshing(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setIsRefreshing(false);
+      return;
+    }
+
+    const { data: questData } = await supabase.from('Quests').select('*').order('questID', { ascending: false });
+    if (questData) setQuests(questData);
+
+    const { data: projectData } = await supabase.from('Projects').select('projectID, projectTitle').order('projectID', { ascending: true });
+    if (projectData) setProjects(projectData);
+
+    setIsRefreshing(false);
+  };
+
+  // Run once on load
   useEffect(() => {
-    const fetchData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data: questData } = await supabase.from('Quests').select('*').order('questID', { ascending: false });
-      if (questData) setQuests(questData);
-      const { data: projectData } = await supabase.from('Projects').select('projectID, projectTitle').order('projectID', { ascending: true });
-      if (projectData) setProjects(projectData);
-    };
-    fetchData();
+    fetchAllData();
   }, []);
 
   const handleCreateProject = async (title: string) => {
@@ -119,8 +130,20 @@ export default function Home() {
               <TaskForm onAddTask={handleAddTask} activeProject={activeProject} />
               
               <div className="flex justify-between items-center mb-6 mt-2">
-                <div className="flex items-center gap-4">
-                  <h2 className="text-xl font-bold">{currentWorkspaceName}</h2>
+                <h2 className="text-xl font-bold truncate pr-4">{currentWorkspaceName}</h2>
+                
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {/* Manual Refresh Button */}
+                  <button 
+                    onClick={fetchAllData}
+                    disabled={isRefreshing}
+                    className="flex items-center gap-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 hover:text-gray-900 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-blue-500' : ''}`} />
+                    <span className="hidden sm:inline">Refresh</span>
+                  </button>
+
+                  {/* Invite Button */}
                   {activeProject !== null && (
                     <button onClick={() => setIsInviteModalOpen(true)} className="flex items-center gap-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">
                       <UserPlus className="w-4 h-4" /> Invite
@@ -137,7 +160,6 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* SEARCH BAR */}
               <div className="relative mb-6 group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                 <input
@@ -152,20 +174,16 @@ export default function Home() {
               <div className="flex flex-col gap-4">
                 <TaskList
                   quests={displayedQuests.filter(q => {
-                    // 1. Check Tab Filtering
                     if (activeTab === 'Pending' && q.status !== 'Pending') return false;
                     if (activeTab === 'In-Progress' && q.status !== 'In-Progress') return false;
                     if (activeTab === 'Complete' && q.status !== 'Complete') return false;
                     
-                    // 2. Check Search Bar Filtering
                     if (searchQuery.trim()) {
                       const query = searchQuery.toLowerCase();
                       const matchTitle = q.questName.toLowerCase().includes(query);
                       const matchDetails = q.questDetails?.toLowerCase().includes(query) || false;
-                      // If it doesn't match the title OR the details, hide it!
                       if (!matchTitle && !matchDetails) return false;
                     }
-
                     return true;
                   })}
                   onStatusChange={handleStatusChange}

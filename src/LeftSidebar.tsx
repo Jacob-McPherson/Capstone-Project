@@ -152,7 +152,6 @@ export default function LeftSidebar({
             <div className="flex -space-x-3 rtl:space-x-reverse ml-1">
               {teamAvatars.length > 0 ? (
                 <>
-                  {/* FIX: Hardcoded z-index classes so Tailwind doesn't purge them! */}
                   {teamAvatars.slice(0, 2).map((url, i) => (
                     <div key={i} className={`w-10 h-10 rounded-full border-2 border-white bg-gray-100 overflow-hidden shadow-sm transition-transform group-hover:scale-105 ${i === 0 ? 'z-20' : 'z-10'}`}>
                       <img src={url} className="w-full h-full object-cover" />
@@ -165,7 +164,6 @@ export default function LeftSidebar({
                   )}
                 </>
               ) : (
-                // FIX: Loading skeleton for the avatar so the button stays visible!
                 <div className="w-10 h-10 rounded-full border-2 border-white bg-gray-100 animate-pulse shadow-sm"></div>
               )}
             </div>
@@ -177,7 +175,6 @@ export default function LeftSidebar({
                   <span className="text-xs font-semibold text-blue-600 truncate">Level {currentUser.level} {currentUser.title}</span>
                 </>
               ) : (
-                // FIX: Loading skeleton for the text!
                 <>
                   <span className="text-sm font-bold text-gray-400 leading-tight truncate">Loading...</span>
                   <span className="text-xs font-semibold text-gray-300 truncate">Fetching stats</span>

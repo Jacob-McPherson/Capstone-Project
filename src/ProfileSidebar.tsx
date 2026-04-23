@@ -10,7 +10,6 @@ interface ProfileSidebarProps {
     activeProject: number | null;
 }
 
-// FIX: Added lineage and totalXP to the interface so we can render their avatars!
 interface TeamMember {
     id: string;
     username: string;
@@ -25,12 +24,16 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
     const [username, setUsername] = useState<string>('');
     const [isProjectOwner, setIsProjectOwner] = useState(false);
     
+    // NEW AVATAR STATES
     const [userLineage, setUserLineage] = useState<string>('knight');
     const [totalUserXP, setTotalUserXP] = useState(0);
+    
+    // XP States
     const [userStats, setUserStats] = useState({
       level: 1, title: "Undergrad", currentXP: 0, nextLevelXP: 500, percentage: 0
     });
 
+    // Sidebar Initialization Logic
     useEffect(() => {
         const fetchProfileData = async () => {
             setIsLoading(true);
@@ -38,21 +41,27 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
             const { data: { user } } = await supabase.auth.getUser()
             
             if (user) {
+                // 1. Fetch Profile Details
                 const { data: profile } = await supabase.from('Profiles').select('username, avatar_lineage').eq('id', user.id).maybeSingle();
                 if (profile) {
                     if (profile.username) setUsername(profile.username);
                     if (profile.avatar_lineage) setUserLineage(profile.avatar_lineage);
                 }
 
+                // 2. Fetch and Calculate XP
                 const { data: completedQuests } = await supabase.from('Quests').select('XP').eq('user_id', user.id).eq('status', 'Complete');
                 let totalXP = 0;
-                if (completedQuests) totalXP = completedQuests.reduce((sum, quest) => sum + (quest.XP || 0), 0);
+                if (completedQuests) {
+                  totalXP = completedQuests.reduce((sum, quest) => sum + (quest.XP || 0), 0);
+                }
                 
-                setTotalUserXP(totalXP);
+                setTotalUserXP(totalXP); // Save total for the Avatar logic
+
                 const stats = calculateLevel(totalXP);
                 setUserStats({ level: stats.level, title: stats.title, currentXP: stats.currentXP, nextLevelXP: stats.nextLevelXP, percentage: stats.progressPercentage });
             }
 
+            // Solo Mode Exit
             if (!activeProject) {
                 setTeammates([]);
                 setIsProjectOwner(false);
@@ -60,6 +69,7 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
                 return; 
             }
 
+            // 3. MULTIPLAYER TEAM LOGIC
             const { data: projectData } = await supabase.from('Projects').select('user_id').eq('projectID', activeProject).maybeSingle();
             const { data: membersData } = await supabase.from('ProjectMembers').select('user_id').eq('project_id', activeProject);
 
@@ -71,15 +81,15 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
             if (membersData) membersData.forEach(m => allMembers.push({id: m.user_id, isOwner: false}));
 
             if (allMembers.length > 0) {
-                // FIX: Grab the avatar_lineage for the teammates too!
                 const { data: profiles } = await supabase.from('Profiles').select('id, username, avatar_lineage').in('id', allMembers.map(m => m.id));
                 
-                // FIX: Grab all completed quests for the teammates so we can calculate their levels!
                 const { data: teamQuests } = await supabase.from('Quests').select('user_id, XP').in('user_id', allMembers.map(m => m.id)).eq('status', 'Complete');
                 
                 const xpMap: Record<string, number> = {};
                 if (teamQuests) {
-                    teamQuests.forEach(q => { xpMap[q.user_id] = (xpMap[q.user_id] || 0) + (q.XP || 0); });
+                    teamQuests.forEach(q => {
+                        xpMap[q.user_id] = (xpMap[q.user_id] || 0) + (q.XP || 0);
+                    });
                 }
                     
                 if (profiles) {
@@ -89,8 +99,8 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
                             id: p.id, 
                             username: p.username, 
                             isOwner: match?.isOwner || false,
-                            lineage: p.avatar_lineage || 'knight',
-                            totalXP: xpMap[p.id] || 0
+                            lineage: p.avatar_lineage || 'knight', // Grab their lineage
+                            totalXP: xpMap[p.id] || 0 // Grab their aggregated XP
                         };
                     }).sort((a, b) => {
                         if (a.isOwner) return -1;
@@ -102,15 +112,20 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
             setIsLoading(false);
         };
 
-        if (isOpen) fetchProfileData();
+        if (isOpen) {
+            fetchProfileData();
+        }
     }, [isOpen, activeProject]);
 
+    // Removal Logic 
     const handleRemoveMember = async (memberId: string, memberUsername: string) => {
         if (!activeProject) return;
+        
         const confirm = window.confirm(`Are you sure you want to remove @${memberUsername} from this project?`);
         if (!confirm) return;
 
         const { error } = await supabase.from('ProjectMembers').delete().eq('project_id', activeProject).eq('user_id', memberId);
+
         if (!error) setTeammates(teammates.filter(t => t.id !== memberId));
     };
 
@@ -127,10 +142,12 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
 
                 <div className="p-6 flex flex-col gap-8 overflow-y-auto flex-1 hide-scrollbar">
                     
+                    {/* User Avatar Section */}
                     <div className="flex flex-col items-center text-center gap-2">
+                        {/* NEW AVATAR RENDER */}
                         <div className="relative w-28 h-28 rounded-full shadow-lg mb-2 flex items-center justify-center overflow-hidden border-4 border-white bg-gray-100 ring-4 ring-blue-500/20">
                             {userLineage ? (
-                                <img src={getActiveAvatar(userLineage, totalUserXP).url} alt="User Avatar" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/150'; }} />
+                                <img src={getActiveAvatar(userLineage, totalUserXP).url} alt="User Avatar" className="w-full h-full object-cover" />
                             ) : (
                                 <User className="w-10 h-10 text-gray-400" />
                             )}
@@ -141,12 +158,15 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
                             <p className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full inline-block mt-2">
                               Level {userStats.level} {userStats.title}
                             </p>
+                            
+                            {/* Avatar Stage Title */}
                             <p className="text-xs font-semibold text-gray-500 mt-2 tracking-wide uppercase">
                               {getActiveAvatar(userLineage, totalUserXP).title}
                             </p>
                         </div>
                     </div>
 
+                    {/* XP Progress Bar */}
                     <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100">
                         <div className="flex justify-between text-sm font-bold text-gray-700 mb-2">
                             <span className="flex items-center gap-1.5"><Trophy className="w-4 h-4 text-orange-500"/> Total XP</span>
@@ -159,6 +179,7 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
 
                     <hr className="border-gray-100" />
 
+                    {/* Project Team Section */}
                     <div>
                         <div className="flex items-center gap-2 mb-4">
                             <Users className="w-5 h-5 text-gray-400" />
@@ -177,25 +198,34 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
                         ) : (
                             <div className="flex flex-col gap-3 pb-12">
                                 {teammates.map((member) => {
-                                    // FIX: Dynamically run the math for every teammate to render their UI!
                                     const mStats = calculateLevel(member.totalXP);
                                     const mAvatar = getActiveAvatar(member.lineage, member.totalXP);
 
                                     return (
-                                        <div key={member.id} className="group flex items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-colors border border-transparent hover:border-gray-100">
+                                        <div key={member.id} className="group flex items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-colors border border-transparent hover:border-gray-100 relative">
                                             <div className="flex items-center gap-4">
-                                                <div className="relative w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden flex-shrink-0">
-                                                    <img src={mAvatar.url} alt={member.username} className="w-full h-full object-cover" />
-                                                    {member.isOwner && <div className="absolute -top-1 -right-1 bg-amber-400 rounded-full p-0.5 border border-white shadow-sm"><Crown className="w-3 h-3 text-white" /></div>}
+                                                
+                                                <div className="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
+                                                    
+                                                    {/* AVATAR IMAGE for the teammate */}
+                                                    <div className="w-full h-full rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100">
+                                                        <img src={mAvatar.url} alt={member.username} className="w-full h-full object-cover" />
+                                                    </div>
+
+                                                    {member.isOwner && (
+                                                        <div className="absolute -top-1 -right-1 bg-amber-400 rounded-full p-0.5 border border-white shadow-sm z-10"><Crown className="w-3 h-3 text-white" /></div>
+                                                    )}
                                                 </div>
-                                                <div className="flex flex-col">
-                                                    <span className="font-bold text-gray-900 text-sm">@{member.username}</span>
-                                                    <span className="text-xs font-semibold text-gray-500 mt-0.5">Level {mStats.level} {mStats.title}</span>
+
+                                                <div className="flex flex-col flex-1 truncate">
+                                                    <span className="font-bold text-gray-900 text-sm truncate">@{member.username}</span>
+                                                    {/* Dynamic level for the teammate */}
+                                                    <span className="text-xs font-semibold text-gray-500 mt-0.5 truncate">Level {mStats.level} {mStats.title}</span>
                                                 </div>
                                             </div>
 
                                             {isProjectOwner && !member.isOwner && (
-                                                <button onClick={() => handleRemoveMember(member.id, member.username)} className="opacity-0 group-hover:opacity-100 p-2 text-gray-400 hover:text-white hover:bg-red-500 rounded-lg transition-all flex-shrink-0" title="Remove Member">
+                                                <button onClick={() => handleRemoveMember(member.id, member.username)} className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-white hover:bg-red-500 rounded-lg transition-all flex-shrink-0 ml-1" title="Remove Member">
                                                     <UserMinus className="w-4 h-4" />
                                                 </button>
                                             )}
