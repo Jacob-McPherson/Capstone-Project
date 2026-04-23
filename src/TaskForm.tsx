@@ -95,7 +95,7 @@ export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
                 />
 
                 {/* bottom row controls */}
-                <div className="flex flex-wrap items-center justify-between gap-4 mt-2 pt-4 border-t border-gray-50">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mt-2 pt-4 border-t border-gray-50">
                     <div className="flex items-center justify-between mt-1">
                         <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
                         <AlertCircle className="w-5 h-5 text-gray-400" />
@@ -138,7 +138,7 @@ export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
                     {/* submit button */}
                     <button
                         type="submit"
-                        className="flex items-center bg-black hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg transition-colors font-medium text-sm"
+                        className="flex items-center justify-center bg-black hover:bg-gray-800 text-white px-5 py-3 sm:py-2.5 rounded-lg transition-colors font-medium text-sm w-full sm:w-auto mt-2 sm:mt-0"
                         disabled={!title.trim() || isSubmitting}
                     >
                         <Plus className="w-5 h-5 mr-2" />

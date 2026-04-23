@@ -219,7 +219,7 @@ export default function Home() {
             </div>
 
             {/* Right Column: Mini Calendar */}
-            <div className="lg:col-span-1 hidden lg:block">
+            <div className="lg:col-span-1 w-full flex justify-center mt-8 lg:mt-0">
               <MinimalCalendar quests={displayedQuests} />
             </div>
           </main>
