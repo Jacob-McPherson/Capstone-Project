@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./lib/supabase";
-import { Menu, UserPlus } from "lucide-react";
+import { Menu, UserPlus, Search } from "lucide-react"; // <-- NEW: Added Search Icon
 
 // Components
 import MinimalCalendar from "./MinimalCalendar";
-import FullCalendar from "./FullCalendar"; // <-- Added Full Calendar
+import FullCalendar from "./FullCalendar"; 
 import TaskList from "./TaskList";
 import TaskForm from "./TaskForm";
 import ProfileSidebar from "./ProfileSidebar";
@@ -28,6 +28,10 @@ export default function Home() {
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'All Tasks' | 'Pending' | 'In-Progress' | 'Complete'>('All Tasks');
+  
+  // search state
+  const [searchQuery, setSearchQuery] = useState('');
+  
   const [quests, setQuests] = useState<Quest[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProject] = useState<number | null>(null);
@@ -96,16 +100,24 @@ export default function Home() {
 
         {currentView === 'settings' && <Settings />}
 
+        {/* CALENDAR VIEW */}
         {currentView === 'calendar' && (
           <main className="flex-1 w-full h-screen p-0 bg-transparent flex flex-col overflow-hidden">
-            <FullCalendar quests={quests} />
+            <FullCalendar 
+              quests={quests} 
+              onAddTask={handleAddTask}
+              activeProject={activeProject}
+              projects={projects}
+            />
           </main>
         )}
 
+        {/* DASHBOARD VIEW */}
         {currentView === 'dashboard' && (
           <main className="flex-1 p-4 md:p-12 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <TaskForm onAddTask={handleAddTask} activeProject={activeProject} />
+              
               <div className="flex justify-between items-center mb-6 mt-2">
                 <div className="flex items-center gap-4">
                   <h2 className="text-xl font-bold">{currentWorkspaceName}</h2>
@@ -115,8 +127,8 @@ export default function Home() {
                     </button>
                   )}
                 </div>
-                <span className="hidden sm:inline-block text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-md">Level 1 Student</span>
               </div>
+              
               <div className="bg-gray-200 p-1 rounded-full flex items-center justify-between mb-6 overflow-x-auto hide-scrollbar">
                 {['All Tasks', 'Pending', 'In-Progress', 'Complete'].map(tab => (
                   <button key={tab} onClick={() => setActiveTab(tab as any)} className={`flex-1 min-w-[90px] text-center py-2 text-sm font-medium rounded-full transition-all ${activeTab === tab ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-800'}`}>
@@ -124,13 +136,36 @@ export default function Home() {
                   </button>
                 ))}
               </div>
+
+              {/* SEARCH BAR */}
+              <div className="relative mb-6 group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                <input
+                  type="text"
+                  placeholder="Search quests..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm font-medium text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm transition-all"
+                />
+              </div>
+
               <div className="flex flex-col gap-4">
                 <TaskList
                   quests={displayedQuests.filter(q => {
-                    if (activeTab === 'All Tasks') return true;
-                    if (activeTab === 'Pending') return q.status === 'Pending';
-                    if (activeTab === 'In-Progress') return q.status === 'In-Progress';
-                    if (activeTab === 'Complete') return q.status === 'Complete';
+                    // 1. Check Tab Filtering
+                    if (activeTab === 'Pending' && q.status !== 'Pending') return false;
+                    if (activeTab === 'In-Progress' && q.status !== 'In-Progress') return false;
+                    if (activeTab === 'Complete' && q.status !== 'Complete') return false;
+                    
+                    // 2. Check Search Bar Filtering
+                    if (searchQuery.trim()) {
+                      const query = searchQuery.toLowerCase();
+                      const matchTitle = q.questName.toLowerCase().includes(query);
+                      const matchDetails = q.questDetails?.toLowerCase().includes(query) || false;
+                      // If it doesn't match the title OR the details, hide it!
+                      if (!matchTitle && !matchDetails) return false;
+                    }
+
                     return true;
                   })}
                   onStatusChange={handleStatusChange}
@@ -139,7 +174,6 @@ export default function Home() {
               </div>
             </div>
             
-            {/* STICKY CALENDAR FIX & UNHIDDEN ON MOBILE */}
             <div className="lg:col-span-1 w-full flex justify-center lg:justify-end mt-8 lg:mt-0 h-fit sticky top-24 pb-8">
               <MinimalCalendar quests={displayedQuests} />
             </div>
