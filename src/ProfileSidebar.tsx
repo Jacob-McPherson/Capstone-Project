@@ -20,7 +20,6 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
     const [teammates, setTeammates] = useState<TeamMember[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [username, setUsername] = useState<string>('');
-    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [isProjectOwner, setIsProjectOwner] = useState(false);
     
     const [userStats, setUserStats] = useState({
@@ -34,7 +33,6 @@ export default function ProfileSidebar({ isOpen, onClose, activeProject }: Profi
             const { data: { user } } = await supabase.auth.getUser()
             
             if (user) {
-                setCurrentUserId(user.id);
                 const { data: profile } = await supabase.from('Profiles').select('username').eq('id', user.id).maybeSingle();
                 if (profile?.username) setUsername(profile.username);
 
