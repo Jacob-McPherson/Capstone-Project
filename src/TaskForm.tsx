@@ -32,9 +32,9 @@ export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
 
         let finalDueDate = null;
         if (date) {
-            // if no time is selected default to 11:59 PM
+            // If no time is selected, default to 11:59 PM
             const timeString = time || "23:59";
-            finalDueDate = `${date}T${timeString}:00`;
+            finalDueDate = `${date} at ${timeString}`;
         }
 
         // insert task to supabase
@@ -48,11 +48,12 @@ export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
                     questDetails: description.trim() || null,
                     status: 'Pending',
                     priority: priority,
-                    XP: 50, // defautl value can be changed later
-                    dueDate: null // default for untimed tasks
+                    XP: 50,
+                    dueDate: finalDueDate
                 }
             ])
             .select();
+
         if (error) {
             console.error("Error adding taks: ", error.message);
         } else if (data) {
@@ -83,6 +84,8 @@ export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
                     className="w-full bg-gray-200/70 text-gray-900 placeholder-gray-500 rounded-lg px-4 py-2.5 focus:outline-none focus:rin-2 focus:ring-blue-500 transition-all"
                     required
                 />
+
+                {/* description input */}
                 <input
                     type="text"
                     placeholder="Quest description (optional)..."
@@ -92,49 +95,51 @@ export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
                 />
 
                 {/* bottom row controls */}
-                <div className="flex items-center justify-between mt-1">
-                    <AlertCircle className="w-5 h-5 text-gray-400" />
-                    <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-                        <select
-                            value={priority}
-                            onChange={(e) => setPriority(e.target.value as any)}
-                            className="bg-transparent text-sm font-medium text-gray-700 outline-none cursor-pointer"
-                        >
-                            <option value="Low">Low Priority</option>
-                            <option value="Medium">Medium Priority</option>
-                            <option value="High">High Priority</option>
-                        </select>
-                    </div>
+                <div className="flex flex-wrap items-center justify-between gap-4 mt-2 pt-4 border-t border-gray-50">
+                    <div className="flex items-center justify-between mt-1">
+                        <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
+                        <AlertCircle className="w-5 h-5 text-gray-400" />
+                            <select
+                                value={priority}
+                                onChange={(e) => setPriority(e.target.value as any)}
+                                className="bg-transparent text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                            >
+                                <option value="Low">Low Priority</option>
+                                <option value="Medium">Medium Priority</option>
+                                <option value="High">High Priority</option>
+                            </select>
+                        </div>
 
-                    {/* date picker */}
-                    <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition all">
-                        <CalendarIcon className={`w-5 h-5 ${date ? 'text-blue-500' : 'text-gray-400'}`} />
-                        <input
-                            type="date"
-                            value={date}
-                            onChange={(e) => setDate(e.target.value)}
-                            className="bg-transparent text-sm font-medium text-gray-700 outline-none cursor-pointer"
-                        />
-                    </div>
+                        {/* date picker */}
+                        <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition all">
+                            <CalendarIcon className={`w-5 h-5 ${date ? 'text-blue-500' : 'text-gray-400'}`} />
+                            <input
+                                type="date"
+                                value={date}
+                                onChange={(e) => setDate(e.target.value)}
+                                className="bg-transparent text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                            />
+                        </div>
 
-                    {/* time picker only enabled if a date is selected */}
-                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${date ? 'bg-gray-50 border-gray-200 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500' : 'bg-gray-50/50 border-transparent opacity-50'
-                        }`}>
-                        <Clock className={`w-5 h-5 ${time ? 'text-blue-500' : 'text-gray-400'}`} />
-                        <input
-                            type="time"
-                            value={time}
-                            onChange={(e) => setTime(e.target.value)}
-                            disabled={!date}
-                            className="bg-transparent text-sm font-medium text-gray-700 outline-none cursor-pointer disabled:cursor-not-allowed"
-                        />
+                        {/* time picker only enabled if a date is selected */}
+                        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${date ? 'bg-gray-50 border-gray-200 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500' : 'bg-gray-50/50 border-transparent opacity-50'
+                            }`}>
+                            <Clock className={`w-5 h-5 ${time ? 'text-blue-500' : 'text-gray-400'}`} />
+                            <input
+                                type="time"
+                                value={time}
+                                onChange={(e) => setTime(e.target.value)}
+                                disabled={!date}
+                                className="bg-transparent text-sm font-medium text-gray-700 outline-none cursor-pointer disabled:cursor-not-allowed"
+                            />
+                        </div>
                     </div>
 
                     {/* submit button */}
-                    <button 
-                    type="submit" 
-                    className="flex items-center bg-black hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg transition-colors font-medium text-sm"
-                    disabled={!title.trim() || isSubmitting}
+                    <button
+                        type="submit"
+                        className="flex items-center bg-black hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg transition-colors font-medium text-sm"
+                        disabled={!title.trim() || isSubmitting}
                     >
                         <Plus className="w-5 h-5 mr-2" />
                         {isSubmitting ? 'Adding...' : 'Add Task'}

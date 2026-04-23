@@ -49,6 +49,22 @@ function QuestItem({ quest, onStatusChange, onDelete }: {
     'Complete': 'Pending' as const,
   };
 
+  const formatDateTime = (dateString: string | null) => {
+    if(!dateString) return null;
+
+    const [datePart, timePart] = dateString.split('T');
+
+    if(!timePart) return `Due: ${datePart}`;
+
+    let [hours, minutes] = timePart.split(':');
+    let h = parseInt(hours, 10);
+
+    const ampm = h >= 12 ? 'pm' : 'am';
+    h = h % 12 || 12;
+
+    return `Due: ${datePart} at ${h}:${minutes} ${ampm}`;
+  }
+
   return (
     <div className={`p-5 bg-white rounded-xl transition-all duration-200 shadow-sm border ${quest.status === 'Complete'
         ? 'border-green-100 opacity-60'
@@ -82,7 +98,7 @@ function QuestItem({ quest, onStatusChange, onDelete }: {
           <div className="flex items-center justify-between mt-3">
             <span className={`text-sm font-medium ${quest.status === 'Complete' ? 'text-gray-400' : 'text-red-600'
               }`}>
-              {quest.dueDate ? `Due: ${quest.dueDate}` : 'No due date'}
+              {formatDateTime(quest.dueDate)}
             </span>
 
             <button

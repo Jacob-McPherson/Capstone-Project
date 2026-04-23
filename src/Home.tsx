@@ -164,8 +164,8 @@ export default function Home() {
 
         {/* 3. DASHBOARD VIEW */}
         {currentView === 'dashboard' && (
-          <main className="flex-1 p-6 md:p-12 max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="md:col-span-2">
+          <main className="flex-1 p-6 md:p-12 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
 
               <TaskForm onAddTask={handleAddTask} activeProject={activeProject} />
 
@@ -219,7 +219,7 @@ export default function Home() {
             </div>
 
             {/* Right Column: Mini Calendar */}
-            <div className="md:col-span-1 hidden md:block">
+            <div className="lg:col-span-1 hidden lg:block">
               <MinimalCalendar quests={displayedQuests} />
             </div>
           </main>
