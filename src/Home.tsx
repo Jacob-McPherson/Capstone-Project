@@ -12,6 +12,7 @@ import LeftSidebar from "./LeftSidebar";
 import CreateProjectModal from "./CreateProjectModal";
 import Settings from "./Settings";
 import InviteModal from "./InviteModal";
+import WelcomeModal from "./WelcomeModal";
 
 export interface Project { projectID: number; projectTitle: string; }
 export interface Quest {
@@ -29,14 +30,13 @@ export default function Home() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'All Tasks' | 'Pending' | 'In-Progress' | 'Complete'>('All Tasks');
   const [searchQuery, setSearchQuery] = useState('');
-  
   const [quests, setQuests] = useState<Quest[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProject] = useState<number | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  // track if current user is owner
   const [isProjectOwner, setIsProjectOwner] = useState(true);
+  const [needsSetup, setNeedsSetup] = useState(false);
+
 
   // fetch ownership on each project load
   useEffect(() => {
@@ -62,6 +62,12 @@ export default function Home() {
     setIsRefreshing(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setIsRefreshing(false); return; }
+
+    const { data: profile } = await supabase.from('Profiles').select('username').eq('id', user.id).maybeSingle();
+
+    if (!profile || !profile.username || profile.username.trim() === '') {
+      setNeedsSetup(true);
+    }
 
     const { data: questData } = await supabase.from('Quests').select('*').order('questID', { ascending: false });
     if (questData) setQuests(questData);
@@ -227,6 +233,7 @@ export default function Home() {
       <ProfileSidebar isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} activeProject={activeProject} />
       <CreateProjectModal isOpen={isCreateProjectOpen} onClose={() => setIsCreateProjectOpen(false)} onCreate={handleCreateProject} existingProjects={projects} />
       <InviteModal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} activeProjectID={activeProject} />
+      <WelcomeModal isOpen={needsSetup} onComplete={() => { setNeedsSetup(false); fetchAllData();}} />
     </div>
   );
 }
