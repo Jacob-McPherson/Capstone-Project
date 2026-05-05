@@ -27,7 +27,8 @@ export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
         let finalDueDate = null;
         if (date) {
             const timeString = time || "23:59";
-            finalDueDate = `${date}T${timeString}:00`;
+            const localDate = new Date(`${date}T${timeString}:00`);
+            finalDueDate = localDate.toISOString();
         }
 
         const { data, error } = await supabase
