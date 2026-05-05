@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./lib/supabase";
-import { Menu, UserPlus, Search, RefreshCw } from "lucide-react"; 
+import { Menu, UserPlus, Search, RefreshCw } from "lucide-react";
 
 // Components
 import MinimalCalendar from "./MinimalCalendar";
-import FullCalendar from "./FullCalendar"; 
+import FullCalendar from "./FullCalendar";
 import TaskList from "./TaskList";
 import TaskForm from "./TaskForm";
 import ProfileSidebar from "./ProfileSidebar";
@@ -13,6 +13,7 @@ import CreateProjectModal from "./CreateProjectModal";
 import Settings from "./Settings";
 import InviteModal from "./InviteModal";
 import WelcomeModal from "./WelcomeModal";
+import AppTour from "./AppTour";
 
 export interface Project { projectID: number; projectTitle: string; }
 export interface Quest {
@@ -36,6 +37,7 @@ export default function Home() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isProjectOwner, setIsProjectOwner] = useState(true);
   const [needsSetup, setNeedsSetup] = useState(false);
+  const [runTour, setRunTour] = useState(false);
 
 
   // fetch ownership on each project load
@@ -45,16 +47,16 @@ export default function Home() {
         setIsProjectOwner(true); // always owner in personal quests
         return;
       }
-      
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      
+
       // Look up who created the project
       const { data } = await supabase.from('Projects').select('user_id').eq('projectID', activeProject).maybeSingle();
-      
+
       setIsProjectOwner(data?.user_id === user.id);
     };
-    
+
     checkOwnership();
   }, [activeProject]);
 
@@ -144,8 +146,8 @@ export default function Home() {
         {/* CALENDAR VIEW */}
         {currentView === 'calendar' && (
           <main className="flex-1 w-full h-screen p-0 bg-transparent flex flex-col overflow-hidden">
-            <FullCalendar 
-              quests={quests} 
+            <FullCalendar
+              quests={quests}
               onAddTask={handleAddTask}
               activeProject={activeProject}
               projects={projects}
@@ -158,12 +160,12 @@ export default function Home() {
           <main className="flex-1 p-4 md:p-12 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <TaskForm onAddTask={handleAddTask} activeProject={activeProject} />
-              
+
               <div className="flex justify-between items-center mb-6 mt-2">
                 <h2 className="text-xl font-bold truncate pr-4">{currentWorkspaceName}</h2>
-                
+
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <button 
+                  <button
                     onClick={fetchAllData}
                     disabled={isRefreshing}
                     className="flex items-center gap-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 hover:text-gray-900 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
@@ -180,8 +182,9 @@ export default function Home() {
                   )}
                 </div>
               </div>
-              
-              <div className="bg-gray-200 p-1 rounded-full flex items-center justify-between mb-6 overflow-x-auto hide-scrollbar">
+
+              {/* tour-step-3 HERE */}
+              <div className="bg-gray-200 p-1 rounded-full flex items-center justify-between mb-6 overflow-x-auto hide-scrollbar tour-step-3">
                 {['All Tasks', 'Pending', 'In-Progress', 'Complete'].map(tab => (
                   <button key={tab} onClick={() => setActiveTab(tab as any)} className={`flex-1 min-w-[90px] text-center py-2 text-sm font-medium rounded-full transition-all ${activeTab === tab ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-800'}`}>
                     {tab}
@@ -200,13 +203,14 @@ export default function Home() {
                 />
               </div>
 
-              <div className="flex flex-col gap-4">
+              {/* tour step 4 HERE */}
+              <div className="flex flex-col gap-4 tour-step-4">
                 <TaskList
                   quests={displayedQuests.filter(q => {
                     if (activeTab === 'Pending' && q.status !== 'Pending') return false;
                     if (activeTab === 'In-Progress' && q.status !== 'In-Progress') return false;
                     if (activeTab === 'Complete' && q.status !== 'Complete') return false;
-                    
+
                     if (searchQuery.trim()) {
                       const query = searchQuery.toLowerCase();
                       const matchTitle = q.questName.toLowerCase().includes(query);
@@ -217,13 +221,14 @@ export default function Home() {
                   })}
                   onStatusChange={handleStatusChange}
                   onDelete={handleDelete}
-                  onEdit={handleEditTask} 
+                  onEdit={handleEditTask}
                   isOwner={isProjectOwner}
                 />
               </div>
             </div>
-            
-            <div className="lg:col-span-1 w-full flex justify-center lg:justify-end mt-8 lg:mt-0 h-fit sticky top-24 pb-8">
+
+            {/* tour-step-5 HERE */}
+            <div className="lg:col-span-1 w-full flex justify-center lg:justify-end mt-8 lg:mt-0 h-fit sticky top-24 pb-8 tour-step-5">
               <MinimalCalendar quests={displayedQuests} />
             </div>
           </main>
@@ -233,7 +238,17 @@ export default function Home() {
       <ProfileSidebar isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} activeProject={activeProject} />
       <CreateProjectModal isOpen={isCreateProjectOpen} onClose={() => setIsCreateProjectOpen(false)} onCreate={handleCreateProject} existingProjects={projects} />
       <InviteModal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} activeProjectID={activeProject} />
-      <WelcomeModal isOpen={needsSetup} onComplete={() => { setNeedsSetup(false); fetchAllData();}} />
+      <WelcomeModal
+        isOpen={needsSetup}
+        onComplete={() => {
+          setNeedsSetup(false);
+          fetchAllData()
+          setRunTour(true);
+        }}
+      />
+
+      {/* app tour  */}
+      <AppTour run={runTour} onFinish={() => setRunTour(false)} />
     </div>
   );
 }

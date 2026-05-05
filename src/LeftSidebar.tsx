@@ -110,13 +110,17 @@ export default function LeftSidebar({
           <button onClick={() => { setCurrentView('dashboard'); setIsMobileMenuOpen(false); }} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition-colors ${currentView === 'dashboard' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'}`}>
             <LayoutDashboard className="w-5 h-5" /> Dashboard
           </button>
-          <button onClick={() => { setCurrentView('calendar'); setIsMobileMenuOpen(false); }} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition-colors ${currentView === 'calendar' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'}`}>
+          
+          {/* tour-step-7 HERE */}
+          <button onClick={() => { setCurrentView('calendar'); setIsMobileMenuOpen(false); }} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition-colors tour-step-7 ${currentView === 'calendar' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'}`}>
             <Calendar className="w-5 h-5" /> Calendar
           </button>
         </nav>
 
         <div className="flex-1 overflow-y-auto hide-scrollbar">
-          <div className="flex items-center justify-between mb-3 px-2">
+          
+          {/* tour-step-6 HERE */}
+          <div className="flex items-center justify-between mb-3 px-2 tour-step-6">
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Workspaces</h3>
             <button onClick={onCreateProject} className="p-1 hover:bg-gray-100 rounded-md text-gray-400 hover:text-gray-600 transition-colors">
               <Plus className="w-4 h-4" />
@@ -147,8 +151,8 @@ export default function LeftSidebar({
             <Settings className="w-5 h-5" /> Settings
           </button>
           
-          <button onClick={() => { onOpenProfile(); setIsMobileMenuOpen(false); }} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-xl transition-colors text-left border border-transparent hover:border-gray-200 group">
-            
+          {/* tour-step-8 HERE */}
+          <button onClick={() => { onOpenProfile(); setIsMobileMenuOpen(false); }} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-xl transition-colors text-left border border-transparent hover:border-gray-200 group tour-step-8">
             <div className="flex -space-x-3 rtl:space-x-reverse ml-1">
               {teamAvatars.length > 0 ? (
                 <>
