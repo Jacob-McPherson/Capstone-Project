@@ -89,6 +89,12 @@ export default function Home() {
     await supabase.from('Quests').delete().eq('questID', id);
   };
 
+  const handleEditTask = async (id: number, updates: Partial<Quest>) => {
+    setQuests(quests.map(q => q.questID === id ? { ...q, ...updates } : q));
+    const { error } = await supabase.from('Quests').update(updates).eq('questID', id);
+    if (error) console.error("Error updating task:", error.message);
+  };
+
   const displayedQuests = quests.filter(q => q.projectID === activeProject);
   const currentWorkspaceName = activeProject === null ? "Personal Quests" : projects.find(p => p.projectID === activeProject)?.projectTitle || "Project";
 
@@ -188,6 +194,7 @@ export default function Home() {
                   })}
                   onStatusChange={handleStatusChange}
                   onDelete={handleDelete}
+                  onEdit={handleEditTask}
                 />
               </div>
             </div>
