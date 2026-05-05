@@ -22,7 +22,6 @@ export default function WelcomeModal({ isOpen, onComplete }: WelcomeModalProps) 
       return;
     }
     
-    // Basic validation (alphanumeric and underscores only)
     const validUsernameRegex = /^[a-zA-Z0-9_]+$/;
     if (!validUsernameRegex.test(username.trim())) {
       setError('Username can only contain letters, numbers, and underscores.');
@@ -32,10 +31,14 @@ export default function WelcomeModal({ isOpen, onComplete }: WelcomeModalProps) 
     setIsSaving(true);
     setError('');
 
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (user) {
-      // Check if username is already taken (Optional, but good practice)
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !user) {
+        throw new Error("Could not find logged in user.");
+      }
+
+      // 1. Check if username exists
       const { data: existingUser } = await supabase
         .from('Profiles')
         .select('username')
@@ -49,18 +52,27 @@ export default function WelcomeModal({ isOpen, onComplete }: WelcomeModalProps) 
         return;
       }
 
-      // Save the profile
-      const { error: updateError } = await supabase.from('Profiles').update({ 
-        username: username.trim(),
-        avatar_lineage: selectedLineage
-      }).eq('id', user.id);
+      // 2. Save the profile using UPSERT instead of UPDATE
+      const { error: updateError } = await supabase
+        .from('Profiles')
+        .upsert({ 
+          id: user.id, // must pass the ID when upserting!
+          username: username.trim(),
+          avatar_lineage: selectedLineage,
+          updated_at: new Date().toISOString()
+        });
 
       if (updateError) {
-        setError('Failed to save profile. Please try again.');
+        console.error("Database error during profile upsert:", updateError);
+        setError(`Database Error: ${updateError.message}`);
         setIsSaving(false);
       } else {
         onComplete(username.trim());
       }
+    } catch (err: any) {
+      console.error("Caught a crash:", err);
+      setError("Something went completely wrong. Check the console.");
+      setIsSaving(false);
     }
   };
 
