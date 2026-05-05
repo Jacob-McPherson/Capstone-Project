@@ -19,7 +19,6 @@ export default function FullCalendar({ quests, onAddTask, activeProject, project
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Quest | null>(null);
   
-  // FIX: Reverted hour height back to 64px
   const HOUR_HEIGHT = 64;
 
   const getWeekDays = (date: Date) => {
@@ -100,7 +99,6 @@ export default function FullCalendar({ quests, onAddTask, activeProject, project
               <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" />
             </button>
             
-            {/* FIX: Removed overflow-x-auto to kill the scrollbar */}
             <div className="flex-1 flex justify-between gap-1 md:gap-2 mx-1 md:mx-6 overflow-hidden">
               {weekDays.map((date, index) => {
                 const isToday = new Date().toDateString() === date.toDateString();
