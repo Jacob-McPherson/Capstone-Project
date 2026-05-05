@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./lib/supabase";
-import { Menu, UserPlus, Search, RefreshCw } from "lucide-react";
+import { Menu, UserPlus, Search, RefreshCw } from "lucide-react"; 
 
 // Components
 import MinimalCalendar from "./MinimalCalendar";
@@ -33,17 +33,35 @@ export default function Home() {
   const [quests, setQuests] = useState<Quest[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProject] = useState<number | null>(null);
-  
-  // handle the refresh spinning animation state
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // track if current user is owner
+  const [isProjectOwner, setIsProjectOwner] = useState(true);
+
+  // fetch ownership on each project load
+  useEffect(() => {
+    const checkOwnership = async () => {
+      if (activeProject === null) {
+        setIsProjectOwner(true); // always owner in personal quests
+        return;
+      }
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      // Look up who created the project
+      const { data } = await supabase.from('Projects').select('user_id').eq('projectID', activeProject).maybeSingle();
+      
+      setIsProjectOwner(data?.user_id === user.id);
+    };
+    
+    checkOwnership();
+  }, [activeProject]);
 
   const fetchAllData = async () => {
     setIsRefreshing(true);
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setIsRefreshing(false);
-      return;
-    }
+    if (!user) { setIsRefreshing(false); return; }
 
     const { data: questData } = await supabase.from('Quests').select('*').order('questID', { ascending: false });
     if (questData) setQuests(questData);
@@ -54,7 +72,6 @@ export default function Home() {
     setIsRefreshing(false);
   };
 
-  // Run once on load
   useEffect(() => {
     fetchAllData();
   }, []);
@@ -89,6 +106,7 @@ export default function Home() {
     await supabase.from('Quests').delete().eq('questID', id);
   };
 
+  // NEW: Inline Edit Handler
   const handleEditTask = async (id: number, updates: Partial<Quest>) => {
     setQuests(quests.map(q => q.questID === id ? { ...q, ...updates } : q));
     const { error } = await supabase.from('Quests').update(updates).eq('questID', id);
@@ -139,7 +157,6 @@ export default function Home() {
                 <h2 className="text-xl font-bold truncate pr-4">{currentWorkspaceName}</h2>
                 
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  {/* Manual Refresh Button */}
                   <button 
                     onClick={fetchAllData}
                     disabled={isRefreshing}
@@ -194,7 +211,8 @@ export default function Home() {
                   })}
                   onStatusChange={handleStatusChange}
                   onDelete={handleDelete}
-                  onEdit={handleEditTask}
+                  onEdit={handleEditTask} 
+                  isOwner={isProjectOwner}
                 />
               </div>
             </div>
