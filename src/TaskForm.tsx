@@ -49,7 +49,7 @@ export default function TaskForm({ onAddTask, activeProject }: TaskFormProps) {
     };
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8 ">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8 tour-step-2">
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <input type="text" placeholder="What needs to be done?" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-gray-100 text-gray-900 placeholder-gray-500 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" required />
                 <input type="text" placeholder="Quest description (optional)..." value={description} onChange={(e) => setDescription(e.target.value)} className="w-full bg-gray-100 text-gray-900 placeholder-gray-500 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" />
